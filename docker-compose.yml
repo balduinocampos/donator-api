@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=donator_db'
+      - 'POSTGRES_PASSWORD=donator-secret'
+      - 'POSTGRES_USER=donator-user'
+    ports:
+      - '5432:5432'
