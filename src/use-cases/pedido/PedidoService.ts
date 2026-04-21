@@ -1,9 +1,9 @@
-import { IPedidoRepository } from '../../domain/contracts/IPedidoRepository';
-import { IPedidoDoacaoRepository } from '../../domain/contracts/IPedidoDoacaoRepository';
-import { IPedidoEntreHospitaisRepository } from '../../domain/contracts/IPedidoEntreHospitaisRepository';
-import { Pedido } from '../../domain/entities/Pedido';
-import { PedidoDoacao } from '../../domain/entities/PedidoDoacao';
-import { PedidoEntreHospitais } from '../../domain/entities/PedidoEntreHospitais';
+import { IPedidoRepository } from '@/domain/contracts/IPedidoRepository';
+import { IPedidoDoacaoRepository } from '@/domain/contracts/IPedidoDoacaoRepository';
+import { IPedidoEntreHospitaisRepository } from '@/domain/contracts/IPedidoEntreHospitaisRepository';
+import { Pedido } from '@/domain/entities/Pedido';
+import { PedidoDoacao } from '@/domain/entities/PedidoDoacao';
+import { PedidoEntreHospitais } from '@/domain/entities/PedidoEntreHospitais';
 import {
   CreatePedidoDTO, UpdatePedidoDTO, PedidoResponseDTO,
   CreatePedidoDoacaoDTO, UpdatePedidoDoacaoDTO, PedidoDoacaoResponseDTO,

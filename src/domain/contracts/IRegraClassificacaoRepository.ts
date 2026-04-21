@@ -1,4 +1,4 @@
-import { RegraClassificacao } from '../entities/RegraClassificacao';
+import { RegraClassificacao } from '@/domain/entities/RegraClassificacao';
 
 export interface IRegraClassificacaoRepository {
   create(data: RegraClassificacao): Promise<RegraClassificacao>;

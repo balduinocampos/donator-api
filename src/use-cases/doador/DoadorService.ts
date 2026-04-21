@@ -1,6 +1,6 @@
-import { IDoadorRepository } from '../../domain/contracts/IDoadorRepository';
-import { CreateDoadorDTO, UpdateDoadorDTO, DoadorResponseDTO } from '../../interfaces/dtos/DoadorDTO';
-import { Doador } from '../../domain/entities/Doador';
+import { IDoadorRepository } from '@/domain/contracts/IDoadorRepository';
+import { CreateDoadorDTO, UpdateDoadorDTO, DoadorResponseDTO } from '@/interfaces/dtos/DoadorDTO';
+import { Doador } from '@/domain/entities/Doador';
 // Assuming you have some hash function
 // import { hashPassword } from '../../utils/crypto';
 

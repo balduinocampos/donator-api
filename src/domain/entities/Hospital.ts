@@ -1,4 +1,4 @@
-import { StatusHospital } from '../enums';
+import { StatusHospital } from '@/domain/enums';
 
 export class Hospital {
   id_hospital?: number;

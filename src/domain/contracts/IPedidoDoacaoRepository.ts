@@ -1,4 +1,4 @@
-import { PedidoDoacao } from '../entities/PedidoDoacao';
+import { PedidoDoacao } from '@/domain/entities/PedidoDoacao';
 
 export interface IPedidoDoacaoRepository {
   create(data: PedidoDoacao): Promise<PedidoDoacao>;

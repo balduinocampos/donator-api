@@ -1,4 +1,4 @@
-import { Agenda } from '../entities/Agenda';
+import { Agenda } from '@/domain/entities/Agenda';
 
 export interface IAgendaRepository {
   create(data: Agenda): Promise<Agenda>;

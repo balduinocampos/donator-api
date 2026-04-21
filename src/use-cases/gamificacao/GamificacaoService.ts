@@ -1,10 +1,10 @@
-import { IEstatisticaDoadorRepository } from '../../domain/contracts/IEstatisticaDoadorRepository';
-import { IRegraClassificacaoRepository } from '../../domain/contracts/IRegraClassificacaoRepository';
-import { EstatisticaDoador } from '../../domain/entities/EstatisticaDoador';
+import { IEstatisticaDoadorRepository } from '@/domain/contracts/IEstatisticaDoadorRepository';
+import { IRegraClassificacaoRepository } from '@/domain/contracts/IRegraClassificacaoRepository';
+import { EstatisticaDoador } from '@/domain/entities/EstatisticaDoador';
 import {
   CreateEstatisticaDoadorDTO, UpdateEstatisticaDoadorDTO, EstatisticaDoadorResponseDTO,
   RegraClassificacaoDTO
-} from '../../interfaces/dtos/GamificacaoDTO';
+} from '@/interfaces/dtos/GamificacaoDTO';
 
 export class GamificacaoService {
   constructor(

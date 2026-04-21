@@ -1,4 +1,4 @@
-import { StatusAgenda } from '../enums';
+import { StatusAgenda } from '@/domain/enums';
 
 export class Agenda {
   id_agenda?: number;

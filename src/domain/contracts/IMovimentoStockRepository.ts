@@ -1,4 +1,4 @@
-import { MovimentoStock } from '../entities/MovimentoStock';
+import { MovimentoStock } from '@/domain/entities/MovimentoStock';
 
 export interface IMovimentoStockRepository {
   create(data: MovimentoStock): Promise<MovimentoStock>;

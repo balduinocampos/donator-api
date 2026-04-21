@@ -1,6 +1,6 @@
-import { IHospitalRepository } from '../../domain/contracts/IHospitalRepository';
-import { CreateHospitalDTO, UpdateHospitalDTO, HospitalResponseDTO } from '../../interfaces/dtos/HospitalDTO';
-import { Hospital } from '../../domain/entities/Hospital';
+import { IHospitalRepository } from '@/domain/contracts/IHospitalRepository';
+import { CreateHospitalDTO, UpdateHospitalDTO, HospitalResponseDTO } from '@/interfaces/dtos/HospitalDTO';
+import { Hospital } from '@/domain/entities/Hospital';
 
 export class HospitalService {
   constructor(private hospitalRepository: IHospitalRepository) {}

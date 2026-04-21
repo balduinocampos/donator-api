@@ -1,4 +1,4 @@
-import { TipoSanguineo } from '../enums';
+import { TipoSanguineo } from '@/domain/enums';
 
 export class Stock {
   id_stock?: number;

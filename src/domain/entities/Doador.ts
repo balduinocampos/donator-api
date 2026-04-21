@@ -1,4 +1,4 @@
-import { TipoSanguineo, StatusDoador } from '../enums';
+import { TipoSanguineo, StatusDoador } from '@/domain/enums';
 
 export class Doador {
   id_doador?: number;

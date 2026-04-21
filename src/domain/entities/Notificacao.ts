@@ -1,4 +1,4 @@
-import { StatusNotificacao } from '../enums';
+import { StatusNotificacao } from '@/domain/enums';
 
 export class Notificacao {
   id_notificacao?: number;

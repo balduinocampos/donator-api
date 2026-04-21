@@ -1,11 +1,11 @@
-import { IStockRepository } from '../../domain/contracts/IStockRepository';
-import { IMovimentoStockRepository } from '../../domain/contracts/IMovimentoStockRepository';
-import { Stock } from '../../domain/entities/Stock';
-import { MovimentoStock } from '../../domain/entities/MovimentoStock';
+import { IStockRepository } from '@/domain/contracts/IStockRepository';
+import { IMovimentoStockRepository } from '@/domain/contracts/IMovimentoStockRepository';
+import { Stock } from '@/domain/entities/Stock';
+import { MovimentoStock } from '@/domain/entities/MovimentoStock';
 import {
   CreateStockDTO, UpdateStockDTO, StockResponseDTO,
   CreateMovimentoStockDTO, MovimentoStockResponseDTO
-} from '../../interfaces/dtos/StockDTO';
+} from '@/interfaces/dtos/StockDTO';
 
 export class StockService {
   constructor(

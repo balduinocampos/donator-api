@@ -1,12 +1,12 @@
-import { IAgendaRepository } from '../../domain/contracts/IAgendaRepository';
-import { IHistoricoDoacaoRepository } from '../../domain/contracts/IHistoricoDoacaoRepository';
-import { Agenda } from '../../domain/entities/Agenda';
-import { HistoricoDoacao } from '../../domain/entities/HistoricoDoacao';
-import { StatusAgenda } from '../../domain/enums';
+import { IAgendaRepository } from '@/domain/contracts/IAgendaRepository';
+import { IHistoricoDoacaoRepository } from '@/domain/contracts/IHistoricoDoacaoRepository';
+import { Agenda } from '@/domain/entities/Agenda';
+import { HistoricoDoacao } from '@/domain/entities/HistoricoDoacao';
+import { StatusAgenda } from '@/domain/enums';
 import {
   CreateAgendaDTO, UpdateAgendaDTO, AgendaResponseDTO,
   CreateHistoricoDoacaoDTO, HistoricoDoacaoResponseDTO
-} from '../../interfaces/dtos/AgendaDTO';
+} from '@/interfaces/dtos/AgendaDTO';
 
 export class AgendaService {
   constructor(

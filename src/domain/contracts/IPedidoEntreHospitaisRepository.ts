@@ -1,4 +1,4 @@
-import { PedidoEntreHospitais } from '../entities/PedidoEntreHospitais';
+import { PedidoEntreHospitais } from '@/domain/entities/PedidoEntreHospitais';
 
 export interface IPedidoEntreHospitaisRepository {
   create(data: PedidoEntreHospitais): Promise<PedidoEntreHospitais>;

@@ -1,4 +1,4 @@
-import { HistoricoDoacao } from '../entities/HistoricoDoacao';
+import { HistoricoDoacao } from '@/domain/entities/HistoricoDoacao';
 
 export interface IHistoricoDoacaoRepository {
   create(data: HistoricoDoacao): Promise<HistoricoDoacao>;

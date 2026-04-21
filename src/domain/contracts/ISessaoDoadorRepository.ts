@@ -1,4 +1,4 @@
-import { SessaoDoador } from '../entities/SessaoDoador';
+import { SessaoDoador } from '@/domain/entities/SessaoDoador';
 
 export interface ISessaoDoadorRepository {
   create(data: SessaoDoador): Promise<SessaoDoador>;

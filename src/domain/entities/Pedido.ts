@@ -1,4 +1,4 @@
-import { TipoSanguineo, NivelUrgencia, StatusPedido } from '../enums';
+import { TipoSanguineo, NivelUrgencia, StatusPedido } from '@/domain/enums';
 
 export class Pedido {
   id_pedido?: number;

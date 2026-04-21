@@ -1,13 +1,13 @@
-import { ILogAcessoRepository } from '../../domain/contracts/ILogAcessoRepository';
-import { ISessaoAdminRepository } from '../../domain/contracts/ISessaoAdminRepository';
-import { ISessaoDoadorRepository } from '../../domain/contracts/ISessaoDoadorRepository';
-import { LogAcesso } from '../../domain/entities/LogAcesso';
-import { SessaoAdmin } from '../../domain/entities/SessaoAdmin';
-import { SessaoDoador } from '../../domain/entities/SessaoDoador';
+import { ILogAcessoRepository } from '@/domain/contracts/ILogAcessoRepository';
+import { ISessaoAdminRepository } from '@/domain/contracts/ISessaoAdminRepository';
+import { ISessaoDoadorRepository } from '@/domain/contracts/ISessaoDoadorRepository';
+import { LogAcesso } from '@/domain/entities/LogAcesso';
+import { SessaoAdmin } from '@/domain/entities/SessaoAdmin';
+import { SessaoDoador } from '@/domain/entities/SessaoDoador';
 import {
   CreateLogAcessoDTO, LogAcessoResponseDTO,
   CreateSessaoDTO, SessaoResponseDTO
-} from '../../interfaces/dtos/AuditoriaDTO';
+} from '@/interfaces/dtos/AuditoriaDTO';
 
 export class AuditoriaService {
   constructor(

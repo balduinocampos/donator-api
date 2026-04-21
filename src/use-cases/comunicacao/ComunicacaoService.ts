@@ -1,11 +1,11 @@
-import { IMensagemRepository } from '../../domain/contracts/IMensagemRepository';
-import { INotificacaoRepository } from '../../domain/contracts/INotificacaoRepository';
-import { Mensagem } from '../../domain/entities/Mensagem';
-import { Notificacao } from '../../domain/entities/Notificacao';
+import { IMensagemRepository } from '@/domain/contracts/IMensagemRepository';
+import { INotificacaoRepository } from '@/domain/contracts/INotificacaoRepository';
+import { Mensagem } from '@/domain/entities/Mensagem';
+import { Notificacao } from '@/domain/entities/Notificacao';
 import {
   CreateMensagemDTO, UpdateMensagemDTO, MensagemResponseDTO,
   CreateNotificacaoDTO, NotificacaoResponseDTO
-} from '../../interfaces/dtos/ComunicacaoDTO';
+} from '@/interfaces/dtos/ComunicacaoDTO';
 
 export class ComunicacaoService {
   constructor(

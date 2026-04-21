@@ -1,4 +1,4 @@
-import { EstatisticaDoador } from '../entities/EstatisticaDoador';
+import { EstatisticaDoador } from '@/domain/entities/EstatisticaDoador';
 
 export interface IEstatisticaDoadorRepository {
   create(data: EstatisticaDoador): Promise<EstatisticaDoador>;

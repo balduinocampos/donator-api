@@ -1,4 +1,4 @@
-import { TipoSanguineo, StatusPedidoEntreHospitais } from '../enums';
+import { TipoSanguineo, StatusPedidoEntreHospitais } from '@/domain/enums';
 
 export class PedidoEntreHospitais {
   id_pedido_entre?: number;

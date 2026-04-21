@@ -1,4 +1,4 @@
-import { Provincia } from '../entities/Provincia';
+import { Provincia } from '@/domain/entities/Provincia';
 
 export interface IProvinciaRepository {
   create(data: Provincia): Promise<Provincia>;

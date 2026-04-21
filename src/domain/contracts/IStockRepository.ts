@@ -1,4 +1,4 @@
-import { Stock } from '../entities/Stock';
+import { Stock } from '@/domain/entities/Stock';
 import { TipoSanguineo } from '../enums';
 
 export interface IStockRepository {

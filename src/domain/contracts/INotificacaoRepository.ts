@@ -1,4 +1,4 @@
-import { Notificacao } from '../entities/Notificacao';
+import { Notificacao } from '@/domain/entities/Notificacao';
 
 export interface INotificacaoRepository {
   create(data: Notificacao): Promise<Notificacao>;

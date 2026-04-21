@@ -1,4 +1,4 @@
-import { SessaoAdmin } from '../entities/SessaoAdmin';
+import { SessaoAdmin } from '@/domain/entities/SessaoAdmin';
 
 export interface ISessaoAdminRepository {
   create(data: SessaoAdmin): Promise<SessaoAdmin>;

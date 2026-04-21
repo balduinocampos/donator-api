@@ -1,4 +1,4 @@
-import { Mensagem } from '../entities/Mensagem';
+import { Mensagem } from '@/domain/entities/Mensagem';
 
 export interface IMensagemRepository {
   create(data: Mensagem): Promise<Mensagem>;

@@ -1,4 +1,4 @@
-import { StatusMensagem } from '../enums';
+import { StatusMensagem } from '@/domain/enums';
 
 export class Mensagem {
   id_mensagem?: number;

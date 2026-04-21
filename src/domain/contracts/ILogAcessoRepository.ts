@@ -1,4 +1,4 @@
-import { LogAcesso } from '../entities/LogAcesso';
+import { LogAcesso } from '@/domain/entities/LogAcesso';
 
 export interface ILogAcessoRepository {
   create(data: LogAcesso): Promise<LogAcesso>;

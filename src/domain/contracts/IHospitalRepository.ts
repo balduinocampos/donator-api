@@ -1,4 +1,4 @@
-import { Hospital } from '../entities/Hospital';
+import { Hospital } from '@/domain/entities/Hospital';
 
 export interface IHospitalRepository {
   create(data: Hospital): Promise<Hospital>;

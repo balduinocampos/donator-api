@@ -1,5 +1,5 @@
-import { IProvinciaRepository } from '../../domain/contracts/IProvinciaRepository';
-import { IMunicipioRepository } from '../../domain/contracts/IMunicipioRepository';
+import { IProvinciaRepository } from '@/domain/contracts/IProvinciaRepository';
+import { IMunicipioRepository } from '@/domain/contracts/IMunicipioRepository';
 import { 
   CreateProvinciaDTO, 
   UpdateProvinciaDTO, 
@@ -8,8 +8,8 @@ import {
   UpdateMunicipioDTO,
   MunicipioResponseDTO
 } from '../../interfaces/dtos/GeografiaDTO';
-import { Provincia } from '../../domain/entities/Provincia';
-import { Municipio } from '../../domain/entities/Municipio';
+import { Provincia } from '@/domain/entities/Provincia';
+import { Municipio } from '@/domain/entities/Municipio';
 
 export class GeografiaService {
   constructor(
