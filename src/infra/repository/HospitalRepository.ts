@@ -1,7 +1,7 @@
 import { IHospitalRepository } from '@/domain/contracts/IHospitalRepository';
 import { Hospital } from '@/domain/entities/Hospital';
 import { prisma } from '@/infra/db/connect';
-import { StatusHospital } from '@prisma/client';
+
 
 export class HospitalRepository implements IHospitalRepository {
   async create(data: Hospital): Promise<Hospital> {
@@ -14,7 +14,7 @@ export class HospitalRepository implements IHospitalRepository {
         telefone: data.telefone,
         email: data.email,
         senha_hash: data.senha_hash,
-        status: data.status as unknown as StatusHospital
+        status: data.status as any
       }
     });
     return created as unknown as Hospital;

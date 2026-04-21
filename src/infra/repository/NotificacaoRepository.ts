@@ -1,7 +1,7 @@
 import { INotificacaoRepository } from '@/domain/contracts/INotificacaoRepository';
 import { Notificacao } from '@/domain/entities/Notificacao';
 import { prisma } from '@/infra/db/connect';
-import { StatusNotificacao } from '@prisma/client';
+
 
 export class NotificacaoRepository implements INotificacaoRepository {
   async create(data: Notificacao): Promise<Notificacao> {
@@ -10,7 +10,7 @@ export class NotificacaoRepository implements INotificacaoRepository {
         id_pedido: data.id_pedido,
         id_doador: data.id_doador,
         mensagem_enviada: data.mensagem_enviada,
-        status_envio: data.status_envio as unknown as StatusNotificacao,
+        status_envio: data.status_envio as any,
         codigo_erro: data.codigo_erro
       }
     });

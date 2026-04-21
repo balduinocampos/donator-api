@@ -1,4 +1,4 @@
-import { StatusMensagem, StatusNotificacao } from '../../domain/enums';
+import { StatusMensagem, StatusNotificacao } from '@/domain/enums';
 
 // Mensagem
 export interface CreateMensagemDTO {

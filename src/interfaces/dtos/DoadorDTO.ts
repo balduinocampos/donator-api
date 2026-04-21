@@ -1,4 +1,4 @@
-import { TipoSanguineo, StatusDoador } from '../../domain/enums';
+import { TipoSanguineo, StatusDoador } from '@/domain/enums';
 
 export interface CreateDoadorDTO {
   nome_completo: string;

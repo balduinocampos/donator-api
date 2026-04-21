@@ -2,14 +2,14 @@ import { IStockRepository } from '@/domain/contracts/IStockRepository';
 import { Stock } from '@/domain/entities/Stock';
 import { TipoSanguineo } from '@/domain/enums';
 import { prisma } from '@/infra/db/connect';
-import { TipoSanguineo as TipoSanguineoPrisma } from '@prisma/client';
+
 
 export class StockRepository implements IStockRepository {
   async create(data: Stock): Promise<Stock> {
     const created = await prisma.stock.create({
       data: {
         id_hospital: data.id_hospital,
-        tipo_sanguineo: data.tipo_sanguineo as unknown as TipoSanguineoPrisma,
+        tipo_sanguineo: data.tipo_sanguineo as any,
         quantidade_bolsas: data.quantidade_bolsas || 0
       }
     });
@@ -26,7 +26,7 @@ export class StockRepository implements IStockRepository {
       where: {
         id_hospital_tipo_sanguineo: {
           id_hospital,
-          tipo_sanguineo: tipo_sanguineo as unknown as TipoSanguineoPrisma
+          tipo_sanguineo: tipo_sanguineo as any
         }
       }
     });

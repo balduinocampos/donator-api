@@ -1,7 +1,7 @@
 import { IDoadorRepository } from '@/domain/contracts/IDoadorRepository';
 import { Doador } from '@/domain/entities/Doador';
 import { prisma } from '@/infra/db/connect';
-import { TipoSanguineo, StatusDoador } from '@prisma/client';
+
 
 export class DoadorRepository implements IDoadorRepository {
   async create(data: Doador): Promise<Doador> {
@@ -11,11 +11,11 @@ export class DoadorRepository implements IDoadorRepository {
         telefone: data.telefone,
         email: data.email,
         senha_hash: data.senha_hash,
-        tipo_sanguineo: data.tipo_sanguineo as unknown as TipoSanguineo,
+        tipo_sanguineo: data.tipo_sanguineo as any,
         id_municipio: data.id_municipio,
         data_nascimento: data.data_nascimento,
         consentimento_sms: data.consentimento_sms,
-        status: data.status as unknown as StatusDoador
+        status: data.status as any
       }
     });
     return created as unknown as Doador;

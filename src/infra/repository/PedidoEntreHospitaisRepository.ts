@@ -1,7 +1,7 @@
 import { IPedidoEntreHospitaisRepository } from '@/domain/contracts/IPedidoEntreHospitaisRepository';
 import { PedidoEntreHospitais } from '@/domain/entities/PedidoEntreHospitais';
 import { prisma } from '@/infra/db/connect';
-import { TipoSanguineo } from '@prisma/client';
+
 
 export class PedidoEntreHospitaisRepository implements IPedidoEntreHospitaisRepository {
   async create(data: PedidoEntreHospitais): Promise<PedidoEntreHospitais> {
@@ -9,7 +9,7 @@ export class PedidoEntreHospitaisRepository implements IPedidoEntreHospitaisRepo
       data: {
         id_solicitante: data.id_solicitante,
         id_fornecedor: data.id_fornecedor,
-        tipo_sanguineo: data.tipo_sanguineo as unknown as TipoSanguineo,
+        tipo_sanguineo: data.tipo_sanguineo as any,
         quantidade_bolsas: data.quantidade_bolsas
       }
     });

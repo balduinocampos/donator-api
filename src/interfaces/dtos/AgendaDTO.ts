@@ -1,4 +1,4 @@
-import { StatusAgenda } from '../../domain/enums';
+import { StatusAgenda } from '@/domain/enums';
 
 // Agenda
 export interface CreateAgendaDTO {

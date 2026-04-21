@@ -1,4 +1,4 @@
-import { TipoSanguineo } from '../../domain/enums';
+import { TipoSanguineo } from '@/domain/enums';
 
 // Stock
 export interface CreateStockDTO {

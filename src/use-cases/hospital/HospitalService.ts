@@ -2,6 +2,10 @@ import { IHospitalRepository } from '@/domain/contracts/IHospitalRepository';
 import { CreateHospitalDTO, UpdateHospitalDTO, HospitalResponseDTO } from '@/interfaces/dtos/HospitalDTO';
 import { Hospital } from '@/domain/entities/Hospital';
 
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { AppError } from '@/shared/error';
+
 export class HospitalService {
   constructor(private hospitalRepository: IHospitalRepository) {}
 
@@ -12,7 +16,7 @@ export class HospitalService {
     const existingNif = await this.hospitalRepository.findByNif(data.nif);
     if (existingNif) throw new Error('NIF already in use');
 
-    const senha_hash = data.senha ? `hashed_${data.senha}` : 'default_hash';
+    const senha_hash = data.senha ? await bcrypt.hash(data.senha, 10) : '';
 
     const hospitalEntity = new Hospital({
       ...data,
@@ -40,6 +44,29 @@ export class HospitalService {
 
   async deleteHospital(id: number): Promise<boolean> {
     return this.hospitalRepository.delete(id);
+  }
+
+  async login(email: string, senhaRaw: string): Promise<{ token: string, user: Omit<Hospital, 'senha_hash'> }> {
+    const hospital = await this.hospitalRepository.findByEmail(email);
+    if (!hospital || !hospital.senha_hash) {
+      throw AppError.unauthorized('Credenciais inválidas');
+    }
+
+    const isMatch = await bcrypt.compare(senhaRaw, hospital.senha_hash);
+    if (!isMatch) {
+      throw AppError.unauthorized('Credenciais inválidas');
+    }
+
+    const token = jwt.sign(
+      { userId: hospital.id_hospital, role: 'hospital' },
+      process.env.JWT_SECRET || 'fallback_secret',
+      { expiresIn: '1d' }
+    );
+
+    return {
+      token,
+      user: this.toResponseDTO(hospital)
+    };
   }
 
   private toResponseDTO(hospital: Hospital): HospitalResponseDTO {

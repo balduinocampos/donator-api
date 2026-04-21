@@ -1,4 +1,4 @@
-import { StatusHospital } from '../../domain/enums';
+import { StatusHospital } from '@/domain/enums';
 
 export interface CreateHospitalDTO {
   nome: string;

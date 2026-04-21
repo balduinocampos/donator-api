@@ -1,4 +1,4 @@
-import { TipoSanguineo, NivelUrgencia, StatusPedido, StatusPedidoDoacao, StatusPedidoEntreHospitais } from '../../domain/enums';
+import { TipoSanguineo, NivelUrgencia, StatusPedido, StatusPedidoDoacao, StatusPedidoEntreHospitais } from '@/domain/enums';
 
 // Pedido (Hospital para SMS)
 export interface CreatePedidoDTO {

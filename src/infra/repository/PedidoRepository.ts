@@ -1,18 +1,18 @@
 import { IPedidoRepository } from '@/domain/contracts/IPedidoRepository';
 import { Pedido } from '@/domain/entities/Pedido';
 import { prisma } from '@/infra/db/connect';
-import { TipoSanguineo, NivelUrgencia } from '@prisma/client';
+
 
 export class PedidoRepository implements IPedidoRepository {
   async create(data: Pedido): Promise<Pedido> {
     const created = await prisma.pedido.create({
       data: {
         id_hospital: data.id_hospital,
-        tipo_sanguineo_necessario: data.tipo_sanguineo_necessario as unknown as TipoSanguineo,
+        tipo_sanguineo_necessario: data.tipo_sanguineo_necessario as any,
         quantidade_necessaria: data.quantidade_necessaria || 1,
         id_municipio_pedido: data.id_municipio_pedido,
         contacto_referencia: data.contacto_referencia,
-        nivel_urgencia: data.nivel_urgencia as unknown as NivelUrgencia,
+        nivel_urgencia: data.nivel_urgencia as any,
         mensagem_adicional: data.mensagem_adicional
       }
     });
