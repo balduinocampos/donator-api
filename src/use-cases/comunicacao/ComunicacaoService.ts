@@ -6,6 +6,7 @@ import {
   CreateMensagemDTO, UpdateMensagemDTO, MensagemResponseDTO,
   CreateNotificacaoDTO, NotificacaoResponseDTO
 } from '@/interfaces/dtos/ComunicacaoDTO';
+import { socketService } from "@/infra/services/socket/socket.io";
 
 export class ComunicacaoService {
   constructor(
@@ -16,8 +17,16 @@ export class ComunicacaoService {
   // === MENSAGENS (Entre Hospitais) ===
   async sendMensagem(data: CreateMensagemDTO): Promise<MensagemResponseDTO> {
     const msg = new Mensagem(data);
-    const created = await this.mensagemRepository.create(msg);
-    return created as MensagemResponseDTO;
+
+    const mensagemCriada = await this.mensagemRepository.create(msg);
+
+    socketService.sendMessage(
+      `user_${data.id_destinatario}`, 
+      'nova_mensagem', 
+      mensagemCriada
+    );
+
+    return mensagemCriada as MensagemResponseDTO;
   }
 
   async readMensagem(id: number): Promise<MensagemResponseDTO> {
