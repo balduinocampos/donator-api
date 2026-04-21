@@ -1,4 +1,4 @@
-// Log Acesso
+
 export interface CreateLogAcessoDTO {
   id_hospital?: number | null;
   id_doador?: number | null;

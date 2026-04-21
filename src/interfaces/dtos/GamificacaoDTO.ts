@@ -1,4 +1,4 @@
-// EstatisticaDoador
+
 export interface CreateEstatisticaDoadorDTO {
   id_doador: number;
   total_doacoes?: number;

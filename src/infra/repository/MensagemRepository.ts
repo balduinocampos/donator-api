@@ -1,7 +1,6 @@
 import { IMensagemRepository } from '@/domain/contracts/IMensagemRepository';
 import { Mensagem } from '@/domain/entities/Mensagem';
 import { prisma } from '@/infra/db/connect';
-//import { StatusMensagem } from '@prisma/client';
 
 export class MensagemRepository implements IMensagemRepository {
   async create(data: Mensagem): Promise<Mensagem> {

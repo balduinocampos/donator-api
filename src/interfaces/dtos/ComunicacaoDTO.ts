@@ -1,6 +1,5 @@
 import { StatusMensagem, StatusNotificacao } from '@/domain/enums';
 
-// Mensagem
 export interface CreateMensagemDTO {
   id_remetente: number;
   id_destinatario: number;

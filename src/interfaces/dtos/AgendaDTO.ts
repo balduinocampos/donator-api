@@ -1,6 +1,5 @@
 import { StatusAgenda } from '@/domain/enums';
 
-// Agenda
 export interface CreateAgendaDTO {
   id_doador: number;
   id_hospital: number;

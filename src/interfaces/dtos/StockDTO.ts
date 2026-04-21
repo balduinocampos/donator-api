@@ -1,6 +1,6 @@
 import { TipoSanguineo } from '@/domain/enums';
 
-// Stock
+
 export interface CreateStockDTO {
   id_hospital: number;
   tipo_sanguineo: TipoSanguineo;

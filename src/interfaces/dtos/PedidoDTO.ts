@@ -1,6 +1,5 @@
 import { TipoSanguineo, NivelUrgencia, StatusPedido, StatusPedidoDoacao, StatusPedidoEntreHospitais } from '@/domain/enums';
 
-// Pedido (Hospital para SMS)
 export interface CreatePedidoDTO {
   id_hospital: number;
   tipo_sanguineo_necessario: TipoSanguineo;
