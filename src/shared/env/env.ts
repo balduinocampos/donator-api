@@ -9,7 +9,14 @@ const schemaEnv = z.object({
   API_PUBLIC_URL: z.string(),
   ENVOIRONMENT: z.enum(["development", "production", "test"]).default("development"),
   SECRET_KEY: z.string(),
-  ALLOWED_HOSTS: z.string()
+  ALLOWED_HOSTS: z.string(),
+  API_JWT_ECDSA_PRIVATE_KEY: z.string(),
+  API_JWT_ECDSA_PUBLIC_KEY: z.string(),
+  CLOUDINARY_CLOUD_NAME: z.string(),
+  CLOUDINARY_API_KEY: z.string(),
+  CLOUDINARY_API_SECRET: z.string(),
+  API_DOMAIN_COOKIE: z.string().default("localhost"),
+  DONATOR_SERVER_ENV_API: z.enum(["staging", "production", "development"]).default("development"),
 });
 
 const _env = schemaEnv.safeParse(process.env);
