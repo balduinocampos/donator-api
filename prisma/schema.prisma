@@ -11,3 +11,505 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+
+// =============================================================
+// ENUMS
+// =============================================================
+
+enum TipoSanguineo {
+  A_POS  @map("A+")
+  A_NEG  @map("A-")
+  B_POS  @map("B+")
+  B_NEG  @map("B-")
+  O_POS  @map("O+")
+  O_NEG  @map("O-")
+  AB_POS @map("AB+")
+  AB_NEG @map("AB-")
+}
+
+enum StatusDoador {
+  ativo
+  inativo
+  bloqueado
+}
+
+enum StatusHospital {
+  ativo
+  suspenso
+  inativo
+}
+
+enum NivelUrgencia {
+  urgente
+  emergencia
+}
+
+enum StatusPedido {
+  ativo
+  fechado
+  cancelado
+}
+
+enum StatusNotificacao {
+  sucesso
+  falha
+}
+
+enum StatusAgenda {
+  pendente    // aguardando avaliação do hospital
+  confirmada  // hospital confirmou
+  rejeitada   // hospital rejeitou
+  concluida   // doação realizada
+  cancelada   // doador cancelou
+}
+
+enum StatusPedidoDoacao {
+  pendente
+  aceite
+  rejeitado
+  cancelado
+}
+
+enum StatusMensagem {
+  enviada
+  lida
+}
+
+enum StatusPedidoEntreHospitais {
+  pendente
+  aceite
+  rejeitado
+  cancelado
+}
+
+// =============================================================
+// GEOGRAFIA — 1FN
+// provincia e municipio eram strings repetidas em Doador e Hospital.
+// Passam a ser entidades com PK própria, ligadas por FK.
+// =============================================================
+
+model Provincia {
+  id_provincia  Int         @id @default(autoincrement())
+  nome          String      @unique @db.VarChar(50)
+
+  municipios    Municipio[]
+
+  @@map("provincia")
+}
+
+// Municipio depende apenas de id_municipio (2FN ok).
+// nome pode repetir entre províncias → chave única composta.
+model Municipio {
+  id_municipio  Int       @id @default(autoincrement())
+  id_provincia  Int
+  nome          String    @db.VarChar(60)
+
+  provincia  Provincia @relation(fields: [id_provincia], references: [id_provincia])
+  doadores   Doador[]
+  hospitais  Hospital[]
+  pedidos    Pedido[]
+
+  @@unique([id_provincia, nome])
+  @@index([id_provincia])
+  @@map("municipio")
+}
+
+// =============================================================
+// REGRA DE CLASSIFICAÇÃO — 3FN
+// Antes: nivel (bronze/prata/ouro/elite) estava em EstatisticaDoador,
+// criando dependência transitiva: nivel → pontuacao → id_doador.
+// Agora: as faixas ficam aqui; o nível é calculado na aplicação.
+// =============================================================
+
+model RegraClassificacao {
+  id_regra          Int    @id @default(autoincrement())
+  nome_nivel        String @unique @db.VarChar(20)
+  pontuacao_minima  Int
+  pontuacao_maxima  Int?   // NULL = sem teto (elite)
+
+  @@map("regra_classificacao")
+}
+
+// =============================================================
+// 1. DOADOR
+// 3FN: data_ultima_doacao removida — é MAX(data_doacao) de
+// HistoricoDoacao; mantê-la aqui causaria anomalia de atualização.
+// 1FN: provincia/municipio substituídos por FK id_municipio.
+// =============================================================
+
+model Doador {
+  id_doador         Int           @id @default(autoincrement())
+  nome_completo     String        @db.VarChar(100)
+  telefone          String        @unique @db.VarChar(15)
+  email             String?       @unique @db.VarChar(80)
+  senha_hash        String        @db.VarChar(255)
+  tipo_sanguineo    TipoSanguineo
+  id_municipio      Int
+  data_nascimento   DateTime?     @db.Date
+  data_cadastro     DateTime      @default(now())
+  status            StatusDoador  @default(ativo)
+  consentimento_sms Boolean       @default(true)
+
+  municipio         Municipio          @relation(fields: [id_municipio], references: [id_municipio])
+  estatisticas      EstatisticaDoador?
+  historicoDoacoes  HistoricoDoacao[]
+  notificacoes      Notificacao[]
+  agendamentos      Agenda[]
+  pedidosDoacoes    PedidoDoacao[]
+  sessoes           SessaoDoador[]
+  logs              LogAcesso[]
+
+  @@index([tipo_sanguineo])
+  @@index([id_municipio])
+  @@map("doador")
+}
+
+// =============================================================
+// 2. HISTÓRICO DE DOAÇÕES
+// Entidade própria: cada doação é um facto independente.
+// Elimina data_ultima_doacao de Doador (anomalia de atualização).
+// Permite calcular total_doacoes e total_centros via agregação.
+// =============================================================
+
+model HistoricoDoacao {
+  id_historico  Int      @id @default(autoincrement())
+  id_doador     Int
+  id_hospital   Int
+  data_doacao   DateTime @db.Date
+  observacao    String?  @db.VarChar(255)
+
+  doador    Doador   @relation(fields: [id_doador],   references: [id_doador])
+  hospital  Hospital @relation(fields: [id_hospital], references: [id_hospital])
+
+  @@index([id_doador])
+  @@index([id_hospital])
+  @@index([data_doacao])
+  @@map("historico_doacao")
+}
+
+// =============================================================
+// 3. ESTATÍSTICA E GAMIFICAÇÃO DO DOADOR
+// 3FN: nivel removido (dependia de pontuacao, não de id_doador).
+// Campos de cache documentados como intencionais para performance.
+// =============================================================
+
+model EstatisticaDoador {
+  id_estatistica     Int      @id @default(autoincrement())
+  id_doador          Int      @unique
+  /// Cache: COUNT(*) em HistoricoDoacao WHERE id_doador = X
+  total_doacoes      Int      @default(0)
+  /// Cache: total_doacoes * 3 (estimativa médica padrão)
+  vidas_salvas       Int      @default(0)
+  /// Cache: COUNT(DISTINCT id_hospital) em HistoricoDoacao WHERE id_doador = X
+  total_centros      Int      @default(0)
+  /// Pontos acumulados por frequência; nível determinado via RegraClassificacao
+  pontuacao          Int      @default(0)
+  ultima_atualizacao DateTime @default(now()) @updatedAt
+
+  doador  Doador @relation(fields: [id_doador], references: [id_doador], onDelete: Cascade)
+
+  @@map("estatistica_doador")
+}
+
+// =============================================================
+// 4. HOSPITAL
+// 1FN: provincia/municipio substituídos por FK id_municipio.
+// 2FN/3FN: todos os atributos dependem exclusivamente de id_hospital.
+// =============================================================
+
+model Hospital {
+  id_hospital   Int            @id @default(autoincrement())
+  nome          String         @db.VarChar(100)
+  nif           String         @unique @db.VarChar(20)
+  id_municipio  Int
+  endereco      String         @db.VarChar(150)
+  telefone      String         @db.VarChar(15)
+  email         String         @unique @db.VarChar(80)
+  senha_hash    String         @db.VarChar(255)
+  data_cadastro DateTime       @default(now())
+  status        StatusHospital @default(ativo)
+
+  municipio              Municipio              @relation(fields: [id_municipio], references: [id_municipio])
+  pedidos                Pedido[]
+  stocks                 Stock[]
+  agendamentos           Agenda[]
+  pedidosDoacoes         PedidoDoacao[]
+  historicosDoacoes      HistoricoDoacao[]
+  sessoes                SessaoAdmin[]
+  logs                   LogAcesso[]
+  mensagensEnviadas      Mensagem[]             @relation("Remetente")
+  mensagensRecebidas     Mensagem[]             @relation("Destinatario")
+  pedidosEntreEnviados   PedidoEntreHospitais[] @relation("HospitalSolicitante")
+  pedidosEntreRecebidos  PedidoEntreHospitais[] @relation("HospitalFornecedor")
+
+  @@index([id_municipio])
+  @@map("hospital")
+}
+
+// =============================================================
+// 5. STOCK DE SANGUE
+// @@unique garante 2FN: quantidade_bolsas depende do par
+// (id_hospital, tipo_sanguineo), não apenas de um deles.
+// =============================================================
+
+model Stock {
+  id_stock           Int           @id @default(autoincrement())
+  id_hospital        Int
+  tipo_sanguineo     TipoSanguineo
+  /// Saldo atual; atualizado a cada MovimentoStock
+  quantidade_bolsas  Int           @default(0)
+  ultima_atualizacao DateTime      @default(now()) @updatedAt
+
+  hospital    Hospital         @relation(fields: [id_hospital], references: [id_hospital], onDelete: Cascade)
+  movimentos  MovimentoStock[]
+
+  @@unique([id_hospital, tipo_sanguineo])
+  @@index([id_hospital])
+  @@map("stock")
+}
+
+// Cada linha = um evento de incremento ou decremento.
+// Todos os campos dependem apenas de id_movimento (2FN/3FN ok).
+model MovimentoStock {
+  id_movimento    Int      @id @default(autoincrement())
+  id_stock        Int
+  /// Positivo = entrada de bolsas; negativo = consumo/saída
+  quantidade      Int
+  observacao      String?  @db.VarChar(255)
+  data_movimento  DateTime @default(now())
+
+  stock  Stock @relation(fields: [id_stock], references: [id_stock], onDelete: Cascade)
+
+  @@index([id_stock])
+  @@index([data_movimento])
+  @@map("movimento_stock")
+}
+
+// =============================================================
+// 6. PEDIDO DE SANGUE (hospital → doadores via SMS)
+// localizacao normalizada: substituída por FK id_municipio_pedido.
+// =============================================================
+
+model Pedido {
+  id_pedido                 Int           @id @default(autoincrement())
+  id_hospital               Int
+  tipo_sanguineo_necessario TipoSanguineo
+  quantidade_necessaria     Int           @default(1)
+  id_municipio_pedido       Int
+  contacto_referencia       String        @db.VarChar(15)
+  nivel_urgencia            NivelUrgencia
+  mensagem_adicional        String?       @db.VarChar(160)
+  data_pedido               DateTime      @default(now())
+  data_fechamento           DateTime?
+  status_pedido             StatusPedido  @default(ativo)
+  /// Cache: COUNT(Notificacao) WHERE id_pedido = X
+  total_notificados         Int           @default(0)
+
+  hospital         Hospital      @relation(fields: [id_hospital],         references: [id_hospital])
+  municipioPedido  Municipio     @relation(fields: [id_municipio_pedido], references: [id_municipio])
+  notificacoes     Notificacao[]
+
+  @@index([tipo_sanguineo_necessario])
+  @@index([status_pedido])
+  @@index([data_pedido])
+  @@map("pedido")
+}
+
+// =============================================================
+// 7. PEDIDO DE DOAÇÃO (doador → hospital pede para ir doar)
+// 2FN/3FN: cada campo depende exclusivamente de id_pedido_doacao.
+// =============================================================
+
+model PedidoDoacao {
+  id_pedido_doacao  Int                @id @default(autoincrement())
+  id_doador         Int
+  id_hospital       Int
+  mensagem          String?            @db.VarChar(255)
+  status            StatusPedidoDoacao @default(pendente)
+  /// Preenchido pelo hospital ao rejeitar
+  motivo_rejeicao   String?            @db.VarChar(255)
+  data_solicitacao  DateTime           @default(now())
+  data_resposta     DateTime?
+
+  doador    Doador   @relation(fields: [id_doador],   references: [id_doador])
+  hospital  Hospital @relation(fields: [id_hospital], references: [id_hospital])
+
+  @@index([id_doador])
+  @@index([id_hospital])
+  @@index([status])
+  @@map("pedido_doacao")
+}
+
+// =============================================================
+// 8. AGENDA
+// Regra de negócio (município do doador = município do hospital)
+// verificada na camada de aplicação via JOIN com Municipio.
+// 3FN: nenhum campo depende de outro não-chave.
+// =============================================================
+
+model Agenda {
+  id_agenda           Int          @id @default(autoincrement())
+  id_doador           Int
+  id_hospital         Int
+  data_agendada       DateTime     @db.Date
+  hora_agendada       DateTime     @db.Time
+  status              StatusAgenda @default(pendente)
+  observacao_doador   String?      @db.VarChar(255)
+  /// Confirmação ou justificativa de rejeição pelo hospital
+  observacao_hospital String?      @db.VarChar(255)
+  data_criacao        DateTime     @default(now())
+  data_atualizacao    DateTime     @updatedAt
+
+  doador    Doador   @relation(fields: [id_doador],   references: [id_doador])
+  hospital  Hospital @relation(fields: [id_hospital], references: [id_hospital])
+
+  @@index([id_doador])
+  @@index([id_hospital])
+  @@index([data_agendada])
+  @@index([status])
+  @@map("agenda")
+}
+
+// =============================================================
+// 9. NOTIFICAÇÃO SMS
+// 2FN CORRIGIDA: telefone_destino removido — dependia de Doador,
+// não de id_notificacao. Obtido via doador.telefone no JOIN.
+// =============================================================
+
+model Notificacao {
+  id_notificacao   Int               @id @default(autoincrement())
+  id_pedido        Int
+  id_doador        Int
+  mensagem_enviada String            @db.Text
+  data_envio       DateTime          @default(now())
+  status_envio     StatusNotificacao
+  /// Código retornado pelo gateway SMS em caso de falha
+  codigo_erro      String?           @db.VarChar(50)
+
+  pedido  Pedido @relation(fields: [id_pedido], references: [id_pedido])
+  doador  Doador @relation(fields: [id_doador], references: [id_doador])
+
+  @@index([id_pedido])
+  @@index([id_doador])
+  @@index([data_envio])
+  @@map("notificacao")
+}
+
+// =============================================================
+// 10. MENSAGEM ENTRE HOSPITAIS
+// 3FN CORRIGIDA: tipo_sanguineo e quantidade_bolsas removidos —
+// dependiam do pedido, não da mensagem. Ficam em PedidoEntreHospitais.
+// Uma mensagem pode referenciar opcionalmente um pedido (FK opcional).
+// =============================================================
+
+model Mensagem {
+  id_mensagem     Int            @id @default(autoincrement())
+  id_remetente    Int
+  id_destinatario Int
+  /// Referência opcional a um pedido formal de sangue entre hospitais
+  id_pedido_entre Int?
+  assunto         String?        @db.VarChar(150)
+  conteudo        String         @db.Text
+  status          StatusMensagem @default(enviada)
+  data_envio      DateTime       @default(now())
+  data_leitura    DateTime?
+
+  remetente    Hospital              @relation("Remetente",    fields: [id_remetente],    references: [id_hospital])
+  destinatario Hospital              @relation("Destinatario", fields: [id_destinatario], references: [id_hospital])
+  pedidoEntre  PedidoEntreHospitais? @relation(fields: [id_pedido_entre], references: [id_pedido_entre])
+
+  @@index([id_remetente])
+  @@index([id_destinatario])
+  @@index([id_pedido_entre])
+  @@index([data_envio])
+  @@map("mensagem")
+}
+
+// Pedido formal de bolsas de sangue de um hospital para outro.
+// Separado de Mensagem para satisfazer a 3FN.
+model PedidoEntreHospitais {
+  id_pedido_entre   Int                        @id @default(autoincrement())
+  id_solicitante    Int
+  id_fornecedor     Int
+  tipo_sanguineo    TipoSanguineo
+  quantidade_bolsas Int
+  status            StatusPedidoEntreHospitais @default(pendente)
+  motivo_rejeicao   String?                    @db.VarChar(255)
+  data_solicitacao  DateTime                   @default(now())
+  data_resposta     DateTime?
+
+  solicitante  Hospital   @relation("HospitalSolicitante", fields: [id_solicitante], references: [id_hospital])
+  fornecedor   Hospital   @relation("HospitalFornecedor",  fields: [id_fornecedor],  references: [id_hospital])
+  mensagens    Mensagem[]
+
+  @@index([id_solicitante])
+  @@index([id_fornecedor])
+  @@index([status])
+  @@map("pedido_entre_hospitais")
+}
+
+// =============================================================
+// 11. SESSÃO ADMIN (hospital logado)
+// =============================================================
+
+model SessaoAdmin {
+  id_sessao      String   @id @db.VarChar(64)
+  id_hospital    Int
+  ip_origem      String   @db.VarChar(45)
+  user_agent     String?  @db.VarChar(255)
+  data_login     DateTime @default(now())
+  data_expiracao DateTime
+  ativo          Boolean  @default(true)
+
+  hospital  Hospital @relation(fields: [id_hospital], references: [id_hospital])
+
+  @@index([id_hospital])
+  @@index([ativo])
+  @@index([data_expiracao])
+  @@map("sessao_admin")
+}
+
+// =============================================================
+// 12. SESSÃO DOADOR
+// =============================================================
+
+model SessaoDoador {
+  id_sessao      String   @id @db.VarChar(64)
+  id_doador      Int
+  ip_origem      String   @db.VarChar(45)
+  user_agent     String?  @db.VarChar(255)
+  data_login     DateTime @default(now())
+  data_expiracao DateTime
+  ativo          Boolean  @default(true)
+
+  doador  Doador @relation(fields: [id_doador], references: [id_doador])
+
+  @@index([id_doador])
+  @@index([ativo])
+  @@map("sessao_doador")
+}
+
+// =============================================================
+// 13. LOG DE ACESSO / AUDITORIA
+// id_hospital e id_doador opcionais (ações anónimas permitidas).
+// =============================================================
+
+model LogAcesso {
+  id_log      Int      @id @default(autoincrement())
+  id_hospital Int?
+  id_doador   Int?
+  acao        String   @db.VarChar(50)
+  descricao   String   @db.Text
+  ip_origem   String   @db.VarChar(45)
+  data_hora   DateTime @default(now())
+
+  hospital  Hospital? @relation(fields: [id_hospital], references: [id_hospital])
+  doador    Doador?   @relation(fields: [id_doador],   references: [id_doador])
+
+  @@index([id_hospital])
+  @@index([id_doador])
+  @@index([data_hora])
+  @@index([acao])
+  @@map("log_acesso")
+}
