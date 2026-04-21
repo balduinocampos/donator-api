@@ -13,11 +13,12 @@ Acompanhar histórico de doações
 Gerenciar doadores e stock de sangue
 
 ## Tecnologias Utilizadas
-Python
-Django
-Django REST Framework
+Nodejs
+Espressjs
+typescript
 PostgreSQL
-JWT Authentication
+Zod
+DrizzleORM
 
 donator-api/
 │
