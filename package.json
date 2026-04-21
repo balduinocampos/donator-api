@@ -1,0 +1,42 @@
+{
+  "name": "donator-api",
+  "version": "1.0.0",
+  "description": "API backend desenvolvida com TypeScript, Expressjs e PostgreSQL para uma plataforma de gestão de doação de sangue em Angola.",
+  "main": "dist/bootstrap/server.js",
+  "scripts": {
+    "dev": "tsx watch src/bootstrap/server.ts",
+    "build": "tsc",
+    "start": "node dist/bootstrap/server.js",
+    "db:studio": "npx prisma studio"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/balduinocampos/donator-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/balduinocampos/donator-api/issues"
+  },
+  "homepage": "https://github.com/balduinocampos/donator-api#readme",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
+    "dotenv": "^17.4.2",
+    "prisma": "^7.7.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}
