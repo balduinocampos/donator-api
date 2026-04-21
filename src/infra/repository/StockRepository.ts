@@ -1,0 +1,58 @@
+import { IStockRepository } from '@/domain/contracts/IStockRepository';
+import { Stock } from '@/domain/entities/Stock';
+import { TipoSanguineo } from '@/domain/enums';
+import { prisma } from '@/infra/db/connect';
+import { TipoSanguineo as TipoSanguineoPrisma } from '@prisma/client';
+
+export class StockRepository implements IStockRepository {
+  async create(data: Stock): Promise<Stock> {
+    const created = await prisma.stock.create({
+      data: {
+        id_hospital: data.id_hospital,
+        tipo_sanguineo: data.tipo_sanguineo as unknown as TipoSanguineoPrisma,
+        quantidade_bolsas: data.quantidade_bolsas || 0
+      }
+    });
+    return created as unknown as Stock;
+  }
+
+  async findById(id_stock: number): Promise<Stock | null> {
+    const s = await prisma.stock.findUnique({ where: { id_stock } });
+    return s as unknown as Stock | null;
+  }
+
+  async findByHospitalAndTipoSanguineo(id_hospital: number, tipo_sanguineo: TipoSanguineo): Promise<Stock | null> {
+    const s = await prisma.stock.findUnique({
+      where: {
+        id_hospital_tipo_sanguineo: {
+          id_hospital,
+          tipo_sanguineo: tipo_sanguineo as unknown as TipoSanguineoPrisma
+        }
+      }
+    });
+    return s as unknown as Stock | null;
+  }
+
+  async findAllByHospital(id_hospital: number): Promise<Stock[]> {
+    const s = await prisma.stock.findMany({ where: { id_hospital } });
+    return s as unknown as Stock[];
+  }
+
+  async findAll(): Promise<Stock[]> {
+    const s = await prisma.stock.findMany();
+    return s as unknown as Stock[];
+  }
+
+  async update(id_stock: number, data: Partial<Stock>): Promise<Stock> {
+    const updated = await prisma.stock.update({
+      where: { id_stock },
+      data: data as any
+    });
+    return updated as unknown as Stock;
+  }
+
+  async delete(id_stock: number): Promise<boolean> {
+    await prisma.stock.delete({ where: { id_stock } });
+    return true;
+  }
+}
