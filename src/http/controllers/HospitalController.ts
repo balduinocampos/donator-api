@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { CreateHospitalSchema, UpdateHospitalSchema } from '../schemas/hospitalSchema';
 import { AuthLoginSchema } from '../schemas/authSchema';
 import { hospitalFactory } from '../factories/hospitalFactory';
+import { auditoriaFactory } from '../factories/auditoriaFactory';
 
 export class HospitalController {
   async register(req: Request, res: Response) {
@@ -27,6 +28,16 @@ export class HospitalController {
     }
   }
 
+  async getAllHospitais(req: Request, res: Response) {
+    try {
+      const service = hospitalFactory();
+      const hospitais = await service.getAllHospitais();
+      return res.json(hospitais);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   async updateInfo(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -39,6 +50,17 @@ export class HospitalController {
     }
   }
 
+  async deleteHospital(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const service = hospitalFactory();
+      await service.deleteHospital(Number(id));
+      return res.status(204).send();
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   async login(req: Request, res: Response) {
     try {
       const { email, senha } = AuthLoginSchema.parse(req.body);
@@ -48,12 +70,27 @@ export class HospitalController {
       res.cookie('token', result.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 
+        maxAge: 24 * 60 * 60 * 1000
+      });
+
+      const auditoria = auditoriaFactory();
+      await auditoria.registerAdminSession({
+        id_sessao: result.token,
+        id_usuario: result.user.id_hospital,
+        ip_origem: req.ip || '0.0.0.0',
+        user_agent: req.headers['user-agent'] || 'Desconhecido',
+        data_expiracao: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      });
+      await auditoria.createLog({
+        id_hospital: result.user.id_hospital,
+        acao: 'LOGIN',
+        descricao: 'Hospital efetuou login com sucesso',
+        ip_origem: req.ip || '0.0.0.0'
       });
 
       return res.json({ message: 'Login com sucesso', user: result.user, token: result.token });
     } catch (error: any) {
-      if(error.statusCode) return res.status(error.statusCode).json({ error: error.message });
+      if (error.statusCode) return res.status(error.statusCode).json({ error: error.message });
       return res.status(400).json({ error: error.message || error });
     }
   }

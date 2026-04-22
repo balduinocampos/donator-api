@@ -25,6 +25,17 @@ export class ComunicacaoController {
     }
   }
 
+  async getInbox(req: Request, res: Response) {
+    try {
+      const { id_hospital } = req.params;
+      const service = comunicacaoFactory();
+      const mensagens = await service.getInbox(Number(id_hospital));
+      return res.json(mensagens);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   async notifyDoador(req: Request, res: Response) {
     try {
       const data = DispatchNotificacaoSchema.parse(req.body);
@@ -33,6 +44,17 @@ export class ComunicacaoController {
       return res.status(201).json(result);
     } catch (error: any) {
       return res.status(400).json({ error: error.message || error });
+    }
+  }
+
+  async getNotificacoesDoador(req: Request, res: Response) {
+    try {
+      const { id_doador } = req.params;
+      const service = comunicacaoFactory();
+      const notificacoes = await service.getNotificacoesDoador(Number(id_doador));
+      return res.json(notificacoes);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
     }
   }
 }

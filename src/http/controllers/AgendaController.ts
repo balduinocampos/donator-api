@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { CreateAgendaSchema, UpdateAgendaSchema } from '../schemas/agendaSchema';
+import { CreateAgendaSchema, UpdateAgendaSchema, CreateHistoricoDoacaoSchema } from '../schemas/agendaSchema';
 import { agendaFactory } from '../factories/agendaFactory';
+import { gamificacaoFactory } from '../factories/gamificacaoFactory';
 
 export class AgendaController {
   async schedule(req: Request, res: Response) {
@@ -21,6 +22,12 @@ export class AgendaController {
       const service = agendaFactory();
       // Service auto-creates "HistoricoDoacao" if status === 'concluida'
       const updated = await service.updateScheduleState(Number(id), data);
+
+      if (data.status === 'concluida') {
+        const gamificacao = gamificacaoFactory();
+        await gamificacao.incrementDonationStats(updated.id_doador);
+      }
+
       return res.json(updated);
     } catch (error: any) {
       return res.status(400).json({ error: error.message || error });
@@ -44,6 +51,28 @@ export class AgendaController {
       const service = agendaFactory();
       const agendas = await service.getHospitalAgenda(Number(id_hospital));
       return res.json(agendas);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async registerHistorico(req: Request, res: Response) {
+    try {
+      const data = CreateHistoricoDoacaoSchema.parse(req.body);
+      const service = agendaFactory();
+      const result = await service.registerHistoricoManually(data);
+      return res.status(201).json(result);
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message || error });
+    }
+  }
+
+  async getHistorico(req: Request, res: Response) {
+    try {
+      const { id_doador } = req.params;
+      const service = agendaFactory();
+      const historico = await service.getHistorico(Number(id_doador));
+      return res.json(historico);
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
