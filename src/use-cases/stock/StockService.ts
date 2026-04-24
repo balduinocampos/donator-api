@@ -6,6 +6,7 @@ import {
   CreateStockDTO, UpdateStockDTO, StockResponseDTO,
   CreateMovimentoStockDTO, MovimentoStockResponseDTO
 } from '@/interfaces/dtos/StockDTO';
+import { AppError } from '@/shared/error';
 
 export class StockService {
   constructor(
@@ -16,9 +17,11 @@ export class StockService {
   // === STOCK ===
   async initializeStock(data: CreateStockDTO): Promise<StockResponseDTO> {
     const existing = await this.stockRepository.findByHospitalAndTipoSanguineo(data.id_hospital, data.tipo_sanguineo);
-    if (existing) throw new Error('Stock already exists for this hospital and blood type');
+
+    if (existing) throw AppError.conflict('Stock already exists for this hospital and blood type');
 
     const created = await this.stockRepository.create(new Stock(data));
+
     return created as StockResponseDTO;
   }
 
@@ -37,10 +40,21 @@ export class StockService {
     return updated as StockResponseDTO;
   }
 
+  async deleteStock(id: number): Promise<void> {
+    const success = await this.stockRepository.delete(id);
+    if (!success) throw AppError.notFound('Stock record not found');
+  }
+
+  async getAllStocks(): Promise<StockResponseDTO[]> {
+    const stocks = await this.stockRepository.findAll();
+    if (!stocks.length) throw AppError.notFound('No stock records found');
+    return stocks as StockResponseDTO[];
+  }
+
   // === MOVIMENTOS (The proper way to update stock) ===
   async registerMovimento(data: CreateMovimentoStockDTO): Promise<MovimentoStockResponseDTO> {
     const stock = await this.stockRepository.findById(data.id_stock);
-    if (!stock) throw new Error('Stock record not found');
+    if (!stock) throw AppError.notFound('Stock record not found');
 
     // 1. Create the Movement
     const movimento = new MovimentoStock(data);
@@ -52,6 +66,33 @@ export class StockService {
 
     return createdMovimento as MovimentoStockResponseDTO;
   }
+
+  async getMovimento(id_movimento: number): Promise<MovimentoStockResponseDTO | null> {
+    const movimento = await this.movimentoStockRepository.findById(id_movimento);
+    return movimento as MovimentoStockResponseDTO | null;
+  }
+  
+  async getAllMovimentos(): Promise<MovimentoStockResponseDTO[]> {
+    const movimentos = await this.movimentoStockRepository.findAll();
+    if (!movimentos.length) throw AppError.notFound('No movement records found');
+    return movimentos as MovimentoStockResponseDTO[];
+  }
+
+  async deleteMovimento(id_movimento: number): Promise<void> {
+    const movimento = await this.movimentoStockRepository.findById(id_movimento);
+    if (!movimento) throw AppError.notFound('Movement record not found');
+
+    // Revert Stock Balance
+    const stock = await this.stockRepository.findById(movimento.id_stock);
+    if (stock) {
+      const revertedBalance = (stock.quantidade_bolsas || 0) - movimento.quantidade;
+      await this.stockRepository.update(movimento.id_stock, { quantidade_bolsas: revertedBalance });
+    }
+
+    const success = await this.movimentoStockRepository.delete(id_movimento);
+    if (!success) throw AppError.notFound('Failed to delete movement record');
+  }
+  
 
   async getMovimentosByStock(id_stock: number): Promise<MovimentoStockResponseDTO[]> {
     const movimentos = await this.movimentoStockRepository.findAllByStock(id_stock);
