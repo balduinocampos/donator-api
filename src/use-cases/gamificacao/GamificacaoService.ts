@@ -38,8 +38,38 @@ export class GamificacaoService {
     return updated as EstatisticaDoadorResponseDTO;
   }
 
+  async getEstatisticasTopDoador(limit: number = 10): Promise<EstatisticaDoadorResponseDTO[]> {
+    const allStats = await this.estatisticaDoadorRepository.findAll();
+    const sorted = allStats.sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
+    return sorted.slice(0, limit) as EstatisticaDoadorResponseDTO[];
+  }
+
+  async getByIdEstatistica(id_estatistica: number): Promise<EstatisticaDoadorResponseDTO | null> {
+    const stats = await this.estatisticaDoadorRepository.findById(id_estatistica);
+    return stats as EstatisticaDoadorResponseDTO | null;
+  }
+
   // === REGRAS / NIVEIS ===
   async getAllRegras(): Promise<RegraClassificacaoDTO[]> {
     return await this.regraClassificacaoRepository.findAll() as RegraClassificacaoDTO[];
+  }
+
+  async getRegraById(id_regra: number): Promise<RegraClassificacaoDTO | null> {
+    const regra = await this.regraClassificacaoRepository.findById(id_regra); 
+    return regra as RegraClassificacaoDTO | null;
+  }
+
+  async createRegraClassificacao(data: RegraClassificacaoDTO): Promise<RegraClassificacaoDTO> {
+    const created = await this.regraClassificacaoRepository.create(data as any);
+    return created as RegraClassificacaoDTO;
+  }
+
+  async updateRegraClassificacao(id_regra: number, data: Partial<RegraClassificacaoDTO>): Promise<RegraClassificacaoDTO> {
+    const updated = await this.regraClassificacaoRepository.update(id_regra, data as any);
+    return updated as RegraClassificacaoDTO;
+  }
+
+  async deleteRegraClassificacao(id_regra: number): Promise<boolean> {
+    return await this.regraClassificacaoRepository.delete(id_regra);
   }
 }
