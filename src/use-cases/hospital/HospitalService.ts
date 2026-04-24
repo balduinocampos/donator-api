@@ -11,10 +11,10 @@ export class HospitalService {
 
   async createHospital(data: CreateHospitalDTO): Promise<HospitalResponseDTO> {
     const existingEmail = await this.hospitalRepository.findByEmail(data.email);
-    if (existingEmail) throw new Error('Email already in use');
+    if (existingEmail) throw AppError.conflict('Email already in use');
 
     const existingNif = await this.hospitalRepository.findByNif(data.nif);
-    if (existingNif) throw new Error('NIF already in use');
+    if (existingNif) throw AppError.conflict('NIF already in use');
 
     const senha_hash = data.senha ? await bcrypt.hash(data.senha, 10) : '';
 
