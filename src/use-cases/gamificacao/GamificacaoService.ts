@@ -5,6 +5,7 @@ import {
   CreateEstatisticaDoadorDTO, UpdateEstatisticaDoadorDTO, EstatisticaDoadorResponseDTO,
   RegraClassificacaoDTO
 } from '@/interfaces/dtos/GamificacaoDTO';
+import { AppError } from '@/shared/error';
 
 export class GamificacaoService {
   constructor(
@@ -15,6 +16,7 @@ export class GamificacaoService {
   // === ESTATISTICAS ===
   async getEstatisticaDoador(id_doador: number): Promise<EstatisticaDoadorResponseDTO | null> {
     const stats = await this.estatisticaDoadorRepository.findByDoador(id_doador);
+    if (!stats) throw AppError.notFound('Estatistica do doador not found');
     return stats as EstatisticaDoadorResponseDTO | null;
   }
 
@@ -40,22 +42,27 @@ export class GamificacaoService {
 
   async getEstatisticasTopDoador(limit: number = 10): Promise<EstatisticaDoadorResponseDTO[]> {
     const allStats = await this.estatisticaDoadorRepository.findAll();
+    if (!allStats.length) throw AppError.notFound('No estatisticas found');
     const sorted = allStats.sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
     return sorted.slice(0, limit) as EstatisticaDoadorResponseDTO[];
   }
 
   async getByIdEstatistica(id_estatistica: number): Promise<EstatisticaDoadorResponseDTO | null> {
     const stats = await this.estatisticaDoadorRepository.findById(id_estatistica);
+    if (!stats) throw AppError.notFound('Estatistica do doador not found');
     return stats as EstatisticaDoadorResponseDTO | null;
   }
 
   // === REGRAS / NIVEIS ===
   async getAllRegras(): Promise<RegraClassificacaoDTO[]> {
-    return await this.regraClassificacaoRepository.findAll() as RegraClassificacaoDTO[];
+    const regras = await this.regraClassificacaoRepository.findAll();
+    if (!regras.length) throw AppError.notFound('No regras found');
+    return regras as RegraClassificacaoDTO[];
   }
 
   async getRegraById(id_regra: number): Promise<RegraClassificacaoDTO | null> {
-    const regra = await this.regraClassificacaoRepository.findById(id_regra); 
+    const regra = await this.regraClassificacaoRepository.findById(id_regra);
+    if (!regra) throw AppError.notFound('Regra not found');
     return regra as RegraClassificacaoDTO | null;
   }
 
