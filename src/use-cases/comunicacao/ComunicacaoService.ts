@@ -37,8 +37,24 @@ export class ComunicacaoService {
     return updated as MensagemResponseDTO;
   }
 
-  async getInbox(id_hospital: number): Promise<MensagemResponseDTO[]> {
+  async getSentMessages(id_hospital: number): Promise<MensagemResponseDTO[]> {
+    const msgs = await this.mensagemRepository.findAllByRemetente(id_hospital);
+    return msgs as MensagemResponseDTO[];
+  }
+  
+  async getReceivedMessages(id_hospital: number): Promise<MensagemResponseDTO[]> {  
+
     const msgs = await this.mensagemRepository.findAllByDestinatario(id_hospital);
+
+    return msgs as MensagemResponseDTO[];
+  }
+
+  async deleteMensagem(id: number): Promise<boolean> {
+    return await this.mensagemRepository.delete(id);
+  }
+
+  async getAllMessages(): Promise<MensagemResponseDTO[]> {
+    const msgs = await this.mensagemRepository.findAll();
     return msgs as MensagemResponseDTO[];
   }
 

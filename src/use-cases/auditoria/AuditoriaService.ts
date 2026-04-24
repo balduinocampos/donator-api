@@ -26,16 +26,22 @@ export class AuditoriaService {
   // === SESSÕES ADMIN ===
   async registerAdminSession(data: CreateSessaoDTO): Promise<SessaoResponseDTO> {
     const { id_usuario, ...rest } = data;
+
     const sessao = new SessaoAdmin({ ...rest, id_hospital: id_usuario }, data.id_sessao);
+
     const created = await this.sessaoAdminRepository.create(sessao);
+
     return { ...created, id_usuario: created.id_hospital };
   }
 
   // === SESSÕES DOADOR ===
   async registerDoadorSession(data: CreateSessaoDTO): Promise<SessaoResponseDTO> {
     const { id_usuario, ...rest } = data;
+
     const sessao = new SessaoDoador({ ...rest, id_doador: id_usuario }, data.id_sessao);
+
     const created = await this.sessaoDoadorRepository.create(sessao);
+    
     return { ...created, id_usuario: created.id_doador };
   }
 }

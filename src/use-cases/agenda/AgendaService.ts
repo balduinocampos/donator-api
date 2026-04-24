@@ -21,6 +21,16 @@ export class AgendaService {
     return created as AgendaResponseDTO;
   }
 
+  async deleteSchedule(id: number): Promise<boolean> {
+    return await this.agendaRepository.delete(id);
+  }
+
+  async getScheduleById(id: number): Promise<AgendaResponseDTO> {
+    const agenda = await this.agendaRepository.findById(id);
+    if (!agenda) throw new Error('Agenda not found');
+    return agenda as AgendaResponseDTO;
+  }
+
   async updateScheduleState(id: number, data: UpdateAgendaDTO): Promise<AgendaResponseDTO> {
     // If completing the donation, we should also generate a record in HistoricoDoacao automatically (business rule!)
     const agendaAntes = await this.agendaRepository.findById(id);
@@ -59,5 +69,15 @@ export class AgendaService {
   async getHistorico(id_doador: number): Promise<HistoricoDoacaoResponseDTO[]> {
     const historico = await this.historicoDoacaoRepository.findAllByDoador(id_doador);
     return historico as HistoricoDoacaoResponseDTO[];
+  }
+
+  async deleteHistorico(id_historico: number): Promise<boolean> {
+    return await this.historicoDoacaoRepository.delete(id_historico);
+  }
+
+  async getHistoricoById(id_historico: number): Promise<HistoricoDoacaoResponseDTO> {
+    const historico = await this.historicoDoacaoRepository.findById(id_historico);
+    if (!historico) throw new Error('Historico not found');
+    return historico as HistoricoDoacaoResponseDTO;
   }
 }
