@@ -7,6 +7,7 @@ import {
   CreateNotificacaoDTO, NotificacaoResponseDTO
 } from '@/interfaces/dtos/ComunicacaoDTO';
 import { socketService } from "@/infra/services/socket/socket.io";
+import { AppError } from '@/shared/error';
 
 export class ComunicacaoService {
   constructor(
@@ -39,13 +40,14 @@ export class ComunicacaoService {
 
   async getSentMessages(id_hospital: number): Promise<MensagemResponseDTO[]> {
     const msgs = await this.mensagemRepository.findAllByRemetente(id_hospital);
+    if (!msgs.length) throw AppError.notFound('No sent messages found for this hospital');
     return msgs as MensagemResponseDTO[];
   }
   
   async getReceivedMessages(id_hospital: number): Promise<MensagemResponseDTO[]> {  
 
     const msgs = await this.mensagemRepository.findAllByDestinatario(id_hospital);
-
+    if (!msgs.length) throw AppError.notFound('No received messages found for this hospital');
     return msgs as MensagemResponseDTO[];
   }
 
@@ -55,6 +57,7 @@ export class ComunicacaoService {
 
   async getAllMessages(): Promise<MensagemResponseDTO[]> {
     const msgs = await this.mensagemRepository.findAll();
+    if (!msgs.length) throw AppError.notFound('No messages found');
     return msgs as MensagemResponseDTO[];
   }
 
@@ -67,11 +70,13 @@ export class ComunicacaoService {
 
   async getNotificacoesDoador(id_doador: number): Promise<NotificacaoResponseDTO[]> {
     const result = await this.notificacaoRepository.findAllByDoador(id_doador);
+    if (!result.length) throw AppError.notFound('No notifications found for this doador');
     return result as NotificacaoResponseDTO[];
   }
 
   async getNotificacoesPedido(id_pedido: number): Promise<NotificacaoResponseDTO[]> {
     const result = await this.notificacaoRepository.findAllByPedido(id_pedido);
+    if (!result.length) throw AppError.notFound('No notifications found for this pedido');
     return result as NotificacaoResponseDTO[];
   }
 
@@ -81,6 +86,7 @@ export class ComunicacaoService {
 
   async getAllNotificacoes(): Promise<NotificacaoResponseDTO[]> {
     const result = await this.notificacaoRepository.findAll();
+    if (!result.length) throw AppError.notFound('No notifications found');
     return result as NotificacaoResponseDTO[];
   }
 }
