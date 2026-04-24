@@ -10,6 +10,7 @@ import {
 } from '../../interfaces/dtos/GeografiaDTO';
 import { Provincia } from '@/domain/entities/Provincia';
 import { Municipio } from '@/domain/entities/Municipio';
+import { AppError } from '@/shared/error';
 
 export class GeografiaService {
   constructor(
@@ -26,11 +27,13 @@ export class GeografiaService {
 
   async getProvinciaById(id: number): Promise<ProvinciaResponseDTO | null> {
     const provincia = await this.provinciaRepository.findById(id);
+    if (!provincia) throw AppError.notFound('Provincia not found');
     return provincia ? (provincia as ProvinciaResponseDTO) : null;
   }
 
   async getAllProvincias(): Promise<ProvinciaResponseDTO[]> {
     const provincias = await this.provinciaRepository.findAll();
+    if (!provincias.length) throw AppError.notFound('No provincias found');
     return provincias as ProvinciaResponseDTO[];
   }
 
@@ -52,11 +55,13 @@ export class GeografiaService {
 
   async getMunicipioById(id: number): Promise<MunicipioResponseDTO | null> {
     const municipio = await this.municipioRepository.findById(id);
+    if (!municipio) throw AppError.notFound('Municipio not found');
     return municipio ? (municipio as MunicipioResponseDTO) : null;
   }
 
   async getAllMunicipios(): Promise<MunicipioResponseDTO[]> {
     const municipios = await this.municipioRepository.findAll();
+    if (!municipios.length) throw AppError.notFound('No municipios found');
     return municipios as MunicipioResponseDTO[];
   }
 
@@ -66,6 +71,8 @@ export class GeografiaService {
   }
 
   async deleteMunicipio(id: number): Promise<boolean> {
+    const municipio = await this.municipioRepository.findById(id);
+    if (!municipio) throw AppError.notFound('Municipio not found');
     return this.municipioRepository.delete(id);
   }
 }
