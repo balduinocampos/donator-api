@@ -8,6 +8,7 @@ import {
   CreateLogAcessoDTO, LogAcessoResponseDTO,
   CreateSessaoDTO, SessaoResponseDTO
 } from '@/interfaces/dtos/AuditoriaDTO';
+import { AppError } from '@/shared/error';
 
 export class AuditoriaService {
   constructor(
@@ -25,17 +26,19 @@ export class AuditoriaService {
 
   async getLogsByHospital(id_hospital: number): Promise<LogAcessoResponseDTO[]> { 
     const logs = await this.logAcessoRepository.findAllByHospital(id_hospital);
+    if (!logs.length) throw AppError.notFound('No logs found for this hospital');
     return logs as LogAcessoResponseDTO[];
   }
   
   async getLogsByDoador(id_doador: number): Promise<LogAcessoResponseDTO[]> {
     const logs = await this.logAcessoRepository.findAllByDoador(id_doador);
+    if (!logs.length) throw AppError.notFound('No logs found for this doador');
     return logs as LogAcessoResponseDTO[];
   }
 
     async getLogById(id_log: number): Promise<LogAcessoResponseDTO> {
     const log = await this.logAcessoRepository.findById(id_log);
-    if (!log) throw new Error('Log not found');
+    if (!log) throw AppError.notFound('Log not found');
     return log as LogAcessoResponseDTO;
   }
 
@@ -45,7 +48,7 @@ export class AuditoriaService {
 
   async updateLog(id_log: number, data: Partial<CreateLogAcessoDTO>): Promise<LogAcessoResponseDTO> {
     const logAntes = await this.logAcessoRepository.findById(id_log);
-    if (!logAntes) throw new Error('Log not found');
+    if (!logAntes) throw AppError.notFound('Log not found');
 
     const updated = await this.logAcessoRepository.update(id_log, data);
     return updated as LogAcessoResponseDTO;
@@ -53,6 +56,7 @@ export class AuditoriaService {
 
   async getAllLogs(): Promise<LogAcessoResponseDTO[]> {
     const logs = await this.logAcessoRepository.findAll();
+    if (!logs.length) throw AppError.notFound('No logs found');
     return logs as LogAcessoResponseDTO[];
   }
 
@@ -69,7 +73,7 @@ export class AuditoriaService {
 
   async getAdminSessionById(id_sessao: string): Promise<SessaoResponseDTO> {  
     const sessao = await this.sessaoAdminRepository.findById(id_sessao);
-    if (!sessao) throw new Error('Sessão não encontrada');
+    if (!sessao) throw AppError.notFound('Sessão não encontrada');
     return { ...sessao, id_usuario: sessao.id_hospital } as SessaoResponseDTO;
   }
 
@@ -79,7 +83,7 @@ export class AuditoriaService {
 
   async updateAdminSession(id_sessao: string, data: Partial<CreateSessaoDTO>): Promise<SessaoResponseDTO> {
     const sessaoAntes = await this.sessaoAdminRepository.findById(id_sessao);
-    if (!sessaoAntes) throw new Error('Sessão não encontrada');
+    if (!sessaoAntes) throw AppError.notFound('Sessão não encontrada');
 
     const updated = await this.sessaoAdminRepository.update(id_sessao, data);
     return { ...updated, id_usuario: updated.id_hospital } as SessaoResponseDTO;
@@ -87,11 +91,13 @@ export class AuditoriaService {
 
   async getAllAdminSessions(): Promise<SessaoResponseDTO[]> {
     const sessoes = await this.sessaoAdminRepository.findAll();
+    if (!sessoes.length) throw AppError.notFound('No admin sessions found');
     return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_hospital })) as SessaoResponseDTO[];
   }
 
   async getAdminSessionsByHospital(id_hospital: number): Promise<SessaoResponseDTO[]> {
     const sessoes = await this.sessaoAdminRepository.findAllByHospital(id_hospital);
+    if (!sessoes.length) throw AppError.notFound('No admin sessions found for this hospital');
     return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_hospital })) as SessaoResponseDTO[];
   }
 
@@ -108,7 +114,7 @@ export class AuditoriaService {
 
   async getDoadorSessionById(id_sessao: string): Promise<SessaoResponseDTO> {
     const sessao = await this.sessaoDoadorRepository.findById(id_sessao);
-    if (!sessao) throw new Error('Sessão não encontrada');
+    if (!sessao) throw AppError.notFound('Sessão não encontrada');
     return { ...sessao, id_usuario: sessao.id_doador } as SessaoResponseDTO;
   }
 
@@ -118,7 +124,7 @@ export class AuditoriaService {
 
   async updateDoadorSession(id_sessao: string, data: Partial<CreateSessaoDTO>): Promise<SessaoResponseDTO> {
     const sessaoAntes = await this.sessaoDoadorRepository.findById(id_sessao);
-    if (!sessaoAntes) throw new Error('Sessão não encontrada');
+    if (!sessaoAntes) throw AppError.notFound('Sessão não encontrada');
 
     const updated = await this.sessaoDoadorRepository.update(id_sessao, data);
     return { ...updated, id_usuario: updated.id_doador } as SessaoResponseDTO;
@@ -126,11 +132,13 @@ export class AuditoriaService {
 
   async getAllDoadorSessions(): Promise<SessaoResponseDTO[]> {
     const sessoes = await this.sessaoDoadorRepository.findAll();
+    if (!sessoes.length) throw AppError.notFound('No doador sessions found');
     return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_doador })) as SessaoResponseDTO[];
   }
 
   async getDoadorSessionsByDoador(id_doador: number): Promise<SessaoResponseDTO[]> {
     const sessoes = await this.sessaoDoadorRepository.findAllByDoador(id_doador);
+    if (!sessoes.length) throw AppError.notFound('No doador sessions found for this doador');
     return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_doador })) as SessaoResponseDTO[];
   }
 }
