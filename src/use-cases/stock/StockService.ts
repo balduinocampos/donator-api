@@ -27,16 +27,19 @@ export class StockService {
 
   async getStock(id: number): Promise<StockResponseDTO | null> {
     const stock = await this.stockRepository.findById(id);
+    if (!stock) throw AppError.notFound('Stock record not found');
     return stock as StockResponseDTO | null;
   }
 
   async getHospitalStock(id_hospital: number): Promise<StockResponseDTO[]> {
     const stocks = await this.stockRepository.findAllByHospital(id_hospital);
+    if (!stocks.length) throw AppError.notFound('No stock records found for this hospital');
     return stocks as StockResponseDTO[];
   }
 
   async updateStockAbsolute(id: number, data: UpdateStockDTO): Promise<StockResponseDTO> {
     const updated = await this.stockRepository.update(id, data);
+    if (!updated) throw AppError.notFound('Stock record not found');
     return updated as StockResponseDTO;
   }
 
@@ -69,6 +72,7 @@ export class StockService {
 
   async getMovimento(id_movimento: number): Promise<MovimentoStockResponseDTO | null> {
     const movimento = await this.movimentoStockRepository.findById(id_movimento);
+    if (!movimento) throw AppError.notFound('Movement record not found');
     return movimento as MovimentoStockResponseDTO | null;
   }
   
@@ -96,6 +100,7 @@ export class StockService {
 
   async getMovimentosByStock(id_stock: number): Promise<MovimentoStockResponseDTO[]> {
     const movimentos = await this.movimentoStockRepository.findAllByStock(id_stock);
+    if (!movimentos.length) throw AppError.notFound('No movement records found for this stock');
     return movimentos as MovimentoStockResponseDTO[];
   }
 }
