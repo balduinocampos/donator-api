@@ -9,6 +9,7 @@ import {
   CreatePedidoDoacaoDTO, UpdatePedidoDoacaoDTO, PedidoDoacaoResponseDTO,
   CreatePedidoEntreHospitaisDTO, UpdatePedidoEntreHospitaisDTO, PedidoEntreHospitaisResponseDTO
 } from '../../interfaces/dtos/PedidoDTO';
+import { AppError } from '@/shared/error';
 
 export class PedidoService {
   constructor(
@@ -31,11 +32,13 @@ export class PedidoService {
 
   async getHospitalPedidos(id_hospital: number): Promise<PedidoResponseDTO[]> {
     const pedidos = await this.pedidoRepository.findAllByHospital(id_hospital);
+    if (!pedidos.length) throw AppError.notFound('No pedidos found for this hospital');
     return pedidos as PedidoResponseDTO[];
   }
 
   async getAllPedidos(): Promise<PedidoResponseDTO[]> {
     const pedidos = await this.pedidoRepository.findAll();
+    if (!pedidos.length) throw AppError.notFound('No pedidos found');
     return pedidos as PedidoResponseDTO[];
   }
 
@@ -45,6 +48,7 @@ export class PedidoService {
 
   async getPedidoById(id: number): Promise<PedidoResponseDTO | null> {
     const pedido = await this.pedidoRepository.findById(id);
+    if (!pedido) throw AppError.notFound('Pedido not found');
     return pedido as PedidoResponseDTO | null;
   }
 
@@ -57,6 +61,7 @@ export class PedidoService {
 
   async getPedidoDoacaoById(id: number): Promise<PedidoDoacaoResponseDTO | null> {
     const pedido = await this.pedidoDoacaoRepository.findById(id);
+    if (!pedido) throw AppError.notFound('Pedido de doação not found');
     return pedido as PedidoDoacaoResponseDTO | null;
   }
 
@@ -67,16 +72,19 @@ export class PedidoService {
   
   async getDoacoesByDoador(id_doador: number): Promise<PedidoDoacaoResponseDTO[]> {
     const pedidos = await this.pedidoDoacaoRepository.findAllByDoador(id_doador);
+    if (!pedidos.length) throw AppError.notFound('No pedidos de doação found for this doador');
     return pedidos as PedidoDoacaoResponseDTO[];
   }
 
   async getDoacoesByHospital(id_hospital: number): Promise<PedidoDoacaoResponseDTO[]> {
     const pedidos = await this.pedidoDoacaoRepository.findAllByHospital(id_hospital);
+    if (!pedidos.length) throw AppError.notFound('No pedidos de doação found for this hospital');
     return pedidos as PedidoDoacaoResponseDTO[];
   }
 
   async getAllDoacoes(): Promise<PedidoDoacaoResponseDTO[]> {
     const pedidos = await this.pedidoDoacaoRepository.findAll();
+    if (!pedidos.length) throw AppError.notFound('No pedidos de doação found');
     return pedidos as PedidoDoacaoResponseDTO[];
   }
 
@@ -101,18 +109,26 @@ export class PedidoService {
   }
 
   async getPedidoEntreHospitaisById(id_pedido_entre: number): Promise<PedidoEntreHospitais | null> {
-    return await this.pedidoEntreHospitaisRepository.findById(id_pedido_entre);
+    const pedido = await this.pedidoEntreHospitaisRepository.findById(id_pedido_entre);
+    if (!pedido) throw AppError.notFound('Pedido entre hospitais not found');
+    return pedido;
   }
 
   async getAllBySolicitante(id_solicitante: number): Promise<PedidoEntreHospitais[]> {
-    return await this.pedidoEntreHospitaisRepository.findAllBySolicitante(id_solicitante);
+    const pedidos = await this.pedidoEntreHospitaisRepository.findAllBySolicitante(id_solicitante);
+    if (!pedidos.length) throw AppError.notFound('No pedidos found for this solicitante');
+    return pedidos;
   }
 
   async getAllByFornecedor(id_fornecedor: number): Promise<PedidoEntreHospitais[]> {
-    return await this.pedidoEntreHospitaisRepository.findAllByFornecedor(id_fornecedor);
+    const pedidos = await this.pedidoEntreHospitaisRepository.findAllByFornecedor(id_fornecedor);
+    if (!pedidos.length) throw AppError.notFound('No pedidos found for this fornecedor');
+    return pedidos;
   }
 
   async getAll(): Promise<PedidoEntreHospitais[]> {
-    return await this.pedidoEntreHospitaisRepository.findAll();
+    const pedidos = await this.pedidoEntreHospitaisRepository.findAll();
+    if (!pedidos.length) throw AppError.notFound('No pedidos found');
+    return pedidos;
   }
 }
