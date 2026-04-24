@@ -7,6 +7,7 @@ import {
   CreateAgendaDTO, UpdateAgendaDTO, AgendaResponseDTO,
   CreateHistoricoDoacaoDTO, HistoricoDoacaoResponseDTO
 } from '@/interfaces/dtos/AgendaDTO';
+import { AppError } from '@/shared/error';
 
 export class AgendaService {
   constructor(
@@ -27,14 +28,14 @@ export class AgendaService {
 
   async getScheduleById(id: number): Promise<AgendaResponseDTO> {
     const agenda = await this.agendaRepository.findById(id);
-    if (!agenda) throw new Error('Agenda not found');
+    if (!agenda) throw AppError.notFound('Agenda not found');
     return agenda as AgendaResponseDTO;
   }
 
   async updateScheduleState(id: number, data: UpdateAgendaDTO): Promise<AgendaResponseDTO> {
     // If completing the donation, we should also generate a record in HistoricoDoacao automatically (business rule!)
     const agendaAntes = await this.agendaRepository.findById(id);
-    if (!agendaAntes) throw new Error('Agenda not found');
+    if (!agendaAntes) throw AppError.notFound('Agenda not found');
 
     const updated = await this.agendaRepository.update(id, data);
 
@@ -51,11 +52,19 @@ export class AgendaService {
 
   async getDoadoresAgenda(id_doador: number): Promise<AgendaResponseDTO[]> {
     const result = await this.agendaRepository.findAllByDoador(id_doador);
+    if (!result.length) throw AppError.notFound('No agenda records found for this doador');
+    return result as AgendaResponseDTO[];
+  }
+
+  async getAllAgendas(): Promise<AgendaResponseDTO[]> {
+    const result = await this.agendaRepository.findAll();
+    if (!result.length) throw AppError.notFound('No agenda records found');
     return result as AgendaResponseDTO[];
   }
 
   async getHospitalAgenda(id_hospital: number): Promise<AgendaResponseDTO[]> {
     const result = await this.agendaRepository.findAllByHospital(id_hospital);
+    if (!result.length) throw AppError.notFound('No agenda records found for this hospital');
     return result as AgendaResponseDTO[];
   }
 
@@ -68,6 +77,7 @@ export class AgendaService {
 
   async getHistorico(id_doador: number): Promise<HistoricoDoacaoResponseDTO[]> {
     const historico = await this.historicoDoacaoRepository.findAllByDoador(id_doador);
+    if (!historico.length) throw AppError.notFound('No historico records found for this doador');
     return historico as HistoricoDoacaoResponseDTO[];
   }
 
@@ -77,7 +87,7 @@ export class AgendaService {
 
   async getHistoricoById(id_historico: number): Promise<HistoricoDoacaoResponseDTO> {
     const historico = await this.historicoDoacaoRepository.findById(id_historico);
-    if (!historico) throw new Error('Historico not found');
+    if (!historico) throw AppError.notFound('Historico not found');
     return historico as HistoricoDoacaoResponseDTO;
   }
 }
