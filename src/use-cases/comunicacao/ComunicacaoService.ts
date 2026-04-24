@@ -69,4 +69,18 @@ export class ComunicacaoService {
     const result = await this.notificacaoRepository.findAllByDoador(id_doador);
     return result as NotificacaoResponseDTO[];
   }
+
+  async getNotificacoesPedido(id_pedido: number): Promise<NotificacaoResponseDTO[]> {
+    const result = await this.notificacaoRepository.findAllByPedido(id_pedido);
+    return result as NotificacaoResponseDTO[];
+  }
+
+  async deleteNotificacao(id: number): Promise<boolean> {
+    return await this.notificacaoRepository.delete(id);
+  }
+
+  async getAllNotificacoes(): Promise<NotificacaoResponseDTO[]> {
+    const result = await this.notificacaoRepository.findAll();
+    return result as NotificacaoResponseDTO[];
+  }
 }

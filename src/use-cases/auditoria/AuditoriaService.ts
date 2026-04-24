@@ -23,8 +23,41 @@ export class AuditoriaService {
     return created as LogAcessoResponseDTO;
   }
 
+  async getLogsByHospital(id_hospital: number): Promise<LogAcessoResponseDTO[]> { 
+    const logs = await this.logAcessoRepository.findAllByHospital(id_hospital);
+    return logs as LogAcessoResponseDTO[];
+  }
+  
+  async getLogsByDoador(id_doador: number): Promise<LogAcessoResponseDTO[]> {
+    const logs = await this.logAcessoRepository.findAllByDoador(id_doador);
+    return logs as LogAcessoResponseDTO[];
+  }
+
+    async getLogById(id_log: number): Promise<LogAcessoResponseDTO> {
+    const log = await this.logAcessoRepository.findById(id_log);
+    if (!log) throw new Error('Log not found');
+    return log as LogAcessoResponseDTO;
+  }
+
+  async deleteLog(id_log: number): Promise<boolean> {
+    return await this.logAcessoRepository.delete(id_log);
+  }
+
+  async updateLog(id_log: number, data: Partial<CreateLogAcessoDTO>): Promise<LogAcessoResponseDTO> {
+    const logAntes = await this.logAcessoRepository.findById(id_log);
+    if (!logAntes) throw new Error('Log not found');
+
+    const updated = await this.logAcessoRepository.update(id_log, data);
+    return updated as LogAcessoResponseDTO;
+  }
+
+  async getAllLogs(): Promise<LogAcessoResponseDTO[]> {
+    const logs = await this.logAcessoRepository.findAll();
+    return logs as LogAcessoResponseDTO[];
+  }
+
   // === SESSÕES ADMIN ===
-  async registerAdminSession(data: CreateSessaoDTO): Promise<SessaoResponseDTO> {
+  async registerAdminSession(data: CreateSessaoDTO) {
     const { id_usuario, ...rest } = data;
 
     const sessao = new SessaoAdmin({ ...rest, id_hospital: id_usuario }, data.id_sessao);
@@ -34,8 +67,36 @@ export class AuditoriaService {
     return { ...created, id_usuario: created.id_hospital };
   }
 
+  async getAdminSessionById(id_sessao: string): Promise<SessaoResponseDTO> {  
+    const sessao = await this.sessaoAdminRepository.findById(id_sessao);
+    if (!sessao) throw new Error('Sessão não encontrada');
+    return { ...sessao, id_usuario: sessao.id_hospital } as SessaoResponseDTO;
+  }
+
+  async deleteAdminSession(id_sessao: string): Promise<boolean> {
+    return await this.sessaoAdminRepository.delete(id_sessao);
+  }
+
+  async updateAdminSession(id_sessao: string, data: Partial<CreateSessaoDTO>): Promise<SessaoResponseDTO> {
+    const sessaoAntes = await this.sessaoAdminRepository.findById(id_sessao);
+    if (!sessaoAntes) throw new Error('Sessão não encontrada');
+
+    const updated = await this.sessaoAdminRepository.update(id_sessao, data);
+    return { ...updated, id_usuario: updated.id_hospital } as SessaoResponseDTO;
+  }
+
+  async getAllAdminSessions(): Promise<SessaoResponseDTO[]> {
+    const sessoes = await this.sessaoAdminRepository.findAll();
+    return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_hospital })) as SessaoResponseDTO[];
+  }
+
+  async getAdminSessionsByHospital(id_hospital: number): Promise<SessaoResponseDTO[]> {
+    const sessoes = await this.sessaoAdminRepository.findAllByHospital(id_hospital);
+    return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_hospital })) as SessaoResponseDTO[];
+  }
+
   // === SESSÕES DOADOR ===
-  async registerDoadorSession(data: CreateSessaoDTO): Promise<SessaoResponseDTO> {
+  async registerDoadorSession(data: CreateSessaoDTO) {
     const { id_usuario, ...rest } = data;
 
     const sessao = new SessaoDoador({ ...rest, id_doador: id_usuario }, data.id_sessao);
@@ -43,5 +104,33 @@ export class AuditoriaService {
     const created = await this.sessaoDoadorRepository.create(sessao);
     
     return { ...created, id_usuario: created.id_doador };
+  }
+
+  async getDoadorSessionById(id_sessao: string): Promise<SessaoResponseDTO> {
+    const sessao = await this.sessaoDoadorRepository.findById(id_sessao);
+    if (!sessao) throw new Error('Sessão não encontrada');
+    return { ...sessao, id_usuario: sessao.id_doador } as SessaoResponseDTO;
+  }
+
+  async deleteDoadorSession(id_sessao: string): Promise<boolean> {
+    return await this.sessaoDoadorRepository.delete(id_sessao);
+  }
+
+  async updateDoadorSession(id_sessao: string, data: Partial<CreateSessaoDTO>): Promise<SessaoResponseDTO> {
+    const sessaoAntes = await this.sessaoDoadorRepository.findById(id_sessao);
+    if (!sessaoAntes) throw new Error('Sessão não encontrada');
+
+    const updated = await this.sessaoDoadorRepository.update(id_sessao, data);
+    return { ...updated, id_usuario: updated.id_doador } as SessaoResponseDTO;
+  }
+
+  async getAllDoadorSessions(): Promise<SessaoResponseDTO[]> {
+    const sessoes = await this.sessaoDoadorRepository.findAll();
+    return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_doador })) as SessaoResponseDTO[];
+  }
+
+  async getDoadorSessionsByDoador(id_doador: number): Promise<SessaoResponseDTO[]> {
+    const sessoes = await this.sessaoDoadorRepository.findAllByDoador(id_doador);
+    return sessoes.map(sessao => ({ ...sessao, id_usuario: sessao.id_doador })) as SessaoResponseDTO[];
   }
 }
