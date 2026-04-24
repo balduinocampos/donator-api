@@ -29,11 +29,15 @@ export class HospitalService {
 
   async getHospitalById(id: number): Promise<HospitalResponseDTO | null> {
     const hospital = await this.hospitalRepository.findById(id);
+    if (!hospital) {
+      throw AppError.notFound('Hospital não encontrado');
+    }
     return hospital ? this.toResponseDTO(hospital) : null;
   }
 
   async getAllHospitais(): Promise<HospitalResponseDTO[]> {
     const hospitais = await this.hospitalRepository.findAll();
+    if (!hospitais.length) throw AppError.notFound('No hospitais found');
     return hospitais.map(this.toResponseDTO);
   }
 
