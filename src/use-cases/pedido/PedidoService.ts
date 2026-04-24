@@ -34,11 +34,30 @@ export class PedidoService {
     return pedidos as PedidoResponseDTO[];
   }
 
+  async getAllPedidos(): Promise<PedidoResponseDTO[]> {
+    const pedidos = await this.pedidoRepository.findAll();
+    return pedidos as PedidoResponseDTO[];
+  }
+
+  async deletePedido(id: number): Promise<boolean> {
+    return await this.pedidoRepository.delete(id);
+  }
+
+  async getPedidoById(id: number): Promise<PedidoResponseDTO | null> {
+    const pedido = await this.pedidoRepository.findById(id);
+    return pedido as PedidoResponseDTO | null;
+  }
+
   // === PEDIDO DOAÇÃO (Doador -> Hospital) ===
   async requestDoacao(data: CreatePedidoDoacaoDTO): Promise<PedidoDoacaoResponseDTO> {
     const pedido = new PedidoDoacao(data);
     const created = await this.pedidoDoacaoRepository.create(pedido);
     return created as PedidoDoacaoResponseDTO;
+  }
+
+  async getPedidoDoacaoById(id: number): Promise<PedidoDoacaoResponseDTO | null> {
+    const pedido = await this.pedidoDoacaoRepository.findById(id);
+    return pedido as PedidoDoacaoResponseDTO | null;
   }
 
   async answerPedidoDoacao(id: number, data: UpdatePedidoDoacaoDTO): Promise<PedidoDoacaoResponseDTO> {
@@ -51,6 +70,20 @@ export class PedidoService {
     return pedidos as PedidoDoacaoResponseDTO[];
   }
 
+  async getDoacoesByHospital(id_hospital: number): Promise<PedidoDoacaoResponseDTO[]> {
+    const pedidos = await this.pedidoDoacaoRepository.findAllByHospital(id_hospital);
+    return pedidos as PedidoDoacaoResponseDTO[];
+  }
+
+  async getAllDoacoes(): Promise<PedidoDoacaoResponseDTO[]> {
+    const pedidos = await this.pedidoDoacaoRepository.findAll();
+    return pedidos as PedidoDoacaoResponseDTO[];
+  }
+
+  async deletePedidoDoacao(id: number): Promise<boolean> {
+    return await this.pedidoDoacaoRepository.delete(id);
+  }
+
   // === PEDIDO ENTRE HOSPITAIS ===
   async requestBolsas(data: CreatePedidoEntreHospitaisDTO): Promise<PedidoEntreHospitaisResponseDTO> {
     const pedido = new PedidoEntreHospitais(data);
@@ -61,5 +94,25 @@ export class PedidoService {
   async answerPedidoBolsas(id: number, data: UpdatePedidoEntreHospitaisDTO): Promise<PedidoEntreHospitaisResponseDTO> {
     const updated = await this.pedidoEntreHospitaisRepository.update(id, data);
     return updated as PedidoEntreHospitaisResponseDTO;
+  }
+
+  async deletePedidoEntreHospitais(id: number): Promise<boolean> {
+    return await this.pedidoEntreHospitaisRepository.delete(id);
+  }
+
+  async getPedidoEntreHospitaisById(id_pedido_entre: number): Promise<PedidoEntreHospitais | null> {
+    return await this.pedidoEntreHospitaisRepository.findById(id_pedido_entre);
+  }
+
+  async getAllBySolicitante(id_solicitante: number): Promise<PedidoEntreHospitais[]> {
+    return await this.pedidoEntreHospitaisRepository.findAllBySolicitante(id_solicitante);
+  }
+
+  async getAllByFornecedor(id_fornecedor: number): Promise<PedidoEntreHospitais[]> {
+    return await this.pedidoEntreHospitaisRepository.findAllByFornecedor(id_fornecedor);
+  }
+
+  async getAll(): Promise<PedidoEntreHospitais[]> {
+    return await this.pedidoEntreHospitaisRepository.findAll();
   }
 }
