@@ -13,6 +13,7 @@ export class DoadorService {
       const existingEmail = await this.doadorRepository.findByEmail(data.email);
       if (existingEmail) throw new Error('Email already in use');
     }
+
     const existingPhone = await this.doadorRepository.findByTelefone(data.telefone);
     if (existingPhone) throw new Error('Telefone already in use');
 
@@ -45,6 +46,41 @@ export class DoadorService {
 
   async deleteDoador(id: number): Promise<boolean> {
     return this.doadorRepository.delete(id);
+  }
+
+  async changePassword(id: number, currentSenha: string, newSenha: string): Promise<void> {
+    const doador = await this.doadorRepository.findById(id);
+    if (!doador || !doador.senha_hash) {
+      throw new Error('Doador not found');
+    }
+
+    const isMatch = await bcrypt.compare(currentSenha, doador.senha_hash);
+    if (!isMatch) {
+      throw new Error('Current password is incorrect');
+    }
+
+    const newHash = await bcrypt.hash(newSenha, 10);
+    await this.doadorRepository.update(id, { senha_hash: newHash });
+  }
+
+  async resetPassword(email: string, newSenha: string): Promise<void> {
+    const doador = await this.doadorRepository.findByEmail(email);
+    if (!doador) {
+      throw new Error('Doador not found');
+    }
+
+    const newHash = await bcrypt.hash(newSenha, 10);
+    await this.doadorRepository.update(doador.id_doador!, { senha_hash: newHash });
+  }
+
+  async getDoadorByEmail(email: string): Promise<DoadorResponseDTO | null> {
+    const doador = await this.doadorRepository.findByEmail(email);
+    return doador ? this.toResponseDTO(doador) : null;
+  }
+
+  async getDoadorByTelefone(telefone: string): Promise<DoadorResponseDTO | null> {
+    const doador = await this.doadorRepository.findByTelefone(telefone);
+    return doador ? this.toResponseDTO(doador) : null;
   }
 
   async login(email: string, senhaRaw: string): Promise<{ token: string, user: DoadorResponseDTO }> {
