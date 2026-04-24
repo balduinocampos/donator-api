@@ -4,6 +4,7 @@ import { Doador } from '@/domain/entities/Doador';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AppError } from '@/shared/error';
+import { env } from '@/shared/env/env';
 export class DoadorService {
   constructor(private doadorRepository: IDoadorRepository) {}
 
@@ -11,11 +12,11 @@ export class DoadorService {
     // Check if email or telefone already exists
     if (data.email) {
       const existingEmail = await this.doadorRepository.findByEmail(data.email);
-      if (existingEmail) throw new Error('Email already in use');
+      if (existingEmail) throw AppError.conflict('Email already in use');
     }
 
     const existingPhone = await this.doadorRepository.findByTelefone(data.telefone);
-    if (existingPhone) throw new Error('Telefone already in use');
+    if (existingPhone) throw AppError.conflict('Telefone already in use');
 
     // Hash password here
     const senha_hash = data.senha ? await bcrypt.hash(data.senha, 10) : '';
@@ -31,32 +32,37 @@ export class DoadorService {
 
   async getDoadorById(id: number): Promise<DoadorResponseDTO | null> {
     const doador = await this.doadorRepository.findById(id);
+    if (!doador) throw AppError.notFound('Doador not found');
     return doador ? this.toResponseDTO(doador) : null;
   }
 
   async getAllDoadores(): Promise<DoadorResponseDTO[]> {
     const doadores = await this.doadorRepository.findAll();
+    if (!doadores.length) throw AppError.notFound('No doadores found');
     return doadores.map(this.toResponseDTO);
   }
 
   async updateDoador(id: number, data: UpdateDoadorDTO): Promise<DoadorResponseDTO> {
     const updated = await this.doadorRepository.update(id, data);
+    if (!updated) throw AppError.notFound('Doador not found');
     return this.toResponseDTO(updated);
   }
 
   async deleteDoador(id: number): Promise<boolean> {
-    return this.doadorRepository.delete(id);
+    const deleted = await this.doadorRepository.delete(id);
+    if (!deleted) throw AppError.notFound('Doador not found');
+    return deleted;
   }
 
   async changePassword(id: number, currentSenha: string, newSenha: string): Promise<void> {
     const doador = await this.doadorRepository.findById(id);
     if (!doador || !doador.senha_hash) {
-      throw new Error('Doador not found');
+      throw AppError.notFound('Doador not found');
     }
 
     const isMatch = await bcrypt.compare(currentSenha, doador.senha_hash);
     if (!isMatch) {
-      throw new Error('Current password is incorrect');
+      throw AppError.unauthorized('Current password is incorrect');
     }
 
     const newHash = await bcrypt.hash(newSenha, 10);
@@ -66,7 +72,7 @@ export class DoadorService {
   async resetPassword(email: string, newSenha: string): Promise<void> {
     const doador = await this.doadorRepository.findByEmail(email);
     if (!doador) {
-      throw new Error('Doador not found');
+      throw AppError.notFound('Doador not found');
     }
 
     const newHash = await bcrypt.hash(newSenha, 10);
@@ -75,11 +81,13 @@ export class DoadorService {
 
   async getDoadorByEmail(email: string): Promise<DoadorResponseDTO | null> {
     const doador = await this.doadorRepository.findByEmail(email);
+    if (!doador) throw AppError.notFound('Doador not found');
     return doador ? this.toResponseDTO(doador) : null;
   }
 
   async getDoadorByTelefone(telefone: string): Promise<DoadorResponseDTO | null> {
     const doador = await this.doadorRepository.findByTelefone(telefone);
+    if (!doador) throw AppError.notFound('Doador not found');
     return doador ? this.toResponseDTO(doador) : null;
   }
 
@@ -96,7 +104,7 @@ export class DoadorService {
 
     const token = jwt.sign(
       { userId: doador.id_doador, role: 'doador' },
-      process.env.JWT_SECRET || 'fallback_secret',
+      env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '1d' }
     );
 
