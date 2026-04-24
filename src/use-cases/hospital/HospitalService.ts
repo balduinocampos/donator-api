@@ -69,6 +69,31 @@ export class HospitalService {
     };
   }
 
+  async changePassword(id: number, currentSenha: string, newSenha: string): Promise<void> {
+    const hospital = await this.hospitalRepository.findById(id);
+    if (!hospital || !hospital.senha_hash) {
+      throw AppError.notFound('Hospital não encontrado');
+    }
+
+    const isMatch = await bcrypt.compare(currentSenha, hospital.senha_hash);
+    if (!isMatch) {
+      throw AppError.unauthorized('Senha atual incorreta');
+    }
+
+    const newHash = await bcrypt.hash(newSenha, 10);
+    await this.hospitalRepository.update(id, { senha_hash: newHash });
+  }
+
+  async resetPassword(email: string, newSenha: string): Promise<void> {
+    const hospital = await this.hospitalRepository.findByEmail(email);
+    if (!hospital || !hospital.senha_hash) {
+      throw AppError.notFound('Hospital não encontrado');
+    }
+
+    const newHash = await bcrypt.hash(newSenha, 10);
+    await this.hospitalRepository.update(hospital.id_hospital!, { senha_hash: newHash });
+  }
+
   private toResponseDTO(hospital: Hospital): HospitalResponseDTO {
     const { senha_hash, ...rest } = hospital;
     return rest as HospitalResponseDTO;
