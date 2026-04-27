@@ -5,13 +5,25 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const routes = Router();
 const controller = new HospitalController();
 
-// Públicas
+// ======================
+// PÚBLICAS
+// ======================
 routes.post('/register', controller.register);
 routes.post('/login', controller.login);
 
-// Protegidas
+// ======================
+// PROTEGIDAS
+// ======================
 routes.use(authMiddleware);
+
+// CRUD
+routes.get('/', controller.getAllHospitais);       
 routes.get('/:id', controller.getProfile);
 routes.put('/:id', controller.updateInfo);
+routes.delete('/:id', controller.deleteHospital);    
+
+// SEGURANÇA
+routes.post('/:id/change-password', controller.changePassword);
+routes.post('/reset-password', controller.resetPassword);
 
 export { routes as hospitalRoutes };
