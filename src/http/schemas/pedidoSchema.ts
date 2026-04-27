@@ -1,5 +1,6 @@
 import { validations } from "@/lib/zod";
 import { TipoSanguineo, NivelUrgencia, StatusPedidoDoacao, StatusPedidoEntreHospitais } from '@/domain/enums';
+import { StatusPedido } from '@/domain/enums';
 
 // Pedido regular
 export const CreatePedidoSchema = validations.object({
@@ -35,4 +36,11 @@ export const CreatePedidoEntreHospitaisSchema = validations.object({
 export const AnswerPedidoEntreSchema = validations.object({
   status: validations.nativeEnum(StatusPedidoEntreHospitais),
   motivo_rejeicao: validations.string().optional()
+});
+
+// update pedido normal
+export const UpdatePedidoSchema = validations.object({
+  status_pedido: validations.nativeEnum(StatusPedido).optional(),
+  data_fechamento: validations.date().optional(),
+  total_notificados: validations.number().int().optional()
 });

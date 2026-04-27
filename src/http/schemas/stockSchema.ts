@@ -12,3 +12,7 @@ export const RegisterMovimentoSchema = validations.object({
   quantidade: validations.number().int(), // pode ser negativo para consumo
   observacao: validations.string().optional()
 });
+
+export const UpdateStockSchema = validations.object({
+  quantidade_bolsas: validations.number().int().min(0).optional()
+});

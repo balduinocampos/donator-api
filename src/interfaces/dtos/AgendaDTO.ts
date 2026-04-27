@@ -28,6 +28,7 @@ export interface AgendaResponseDTO {
 
 // HistoricoDoacao
 export interface CreateHistoricoDoacaoDTO {
+  id_agenda: number;
   id_doador: number;
   id_hospital: number;
   data_doacao: Date;

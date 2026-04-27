@@ -55,20 +55,33 @@ export class StockService {
   }
 
   // === MOVIMENTOS (The proper way to update stock) ===
-  async registerMovimento(data: CreateMovimentoStockDTO): Promise<MovimentoStockResponseDTO> {
-    const stock = await this.stockRepository.findById(data.id_stock);
-    if (!stock) throw AppError.notFound('Stock record not found');
+async registerMovimento(data: CreateMovimentoStockDTO): Promise<MovimentoStockResponseDTO> {
+  const stock = await this.stockRepository.findById(data.id_stock);
 
-    // 1. Create the Movement
-    const movimento = new MovimentoStock(data);
-    const createdMovimento = await this.movimentoStockRepository.create(movimento);
-
-    // 2. Update actual Stock Balance
-    const newBalance = (stock.quantidade_bolsas || 0) + data.quantidade;
-    await this.stockRepository.update(data.id_stock, { quantidade_bolsas: newBalance });
-
-    return createdMovimento as MovimentoStockResponseDTO;
+  // 1. Verifica se existe
+  if (!stock) {
+    throw AppError.notFound('Stock record not found');
   }
+
+  // 2. Calcula o novo saldo
+  const newBalance = (stock.quantidade_bolsas || 0) + data.quantidade;
+
+  // 3. Valida saldo negativo
+  if (newBalance < 0) {
+    throw AppError.badRequest('Stock insuficiente para realizar a operação');
+  }
+
+  // 4. Cria o movimento
+  const movimento = new MovimentoStock(data);
+  const createdMovimento = await this.movimentoStockRepository.create(movimento);
+
+  // 5. Atualiza o stock
+  await this.stockRepository.update(data.id_stock, {
+    quantidade_bolsas: newBalance
+  });
+
+  return createdMovimento as MovimentoStockResponseDTO;
+}
 
   async getMovimento(id_movimento: number): Promise<MovimentoStockResponseDTO | null> {
     const movimento = await this.movimentoStockRepository.findById(id_movimento);
