@@ -9,4 +9,5 @@ export interface IStockRepository {
   findAll(): Promise<Stock[]>;
   update(id_stock: number, data: Partial<Stock>): Promise<Stock>;
   delete(id_stock: number): Promise<boolean>;
+  decrementStock(id_stock: number, quantidade: number): Promise<Stock>;
 }

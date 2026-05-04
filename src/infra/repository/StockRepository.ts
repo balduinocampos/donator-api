@@ -46,7 +46,24 @@ export class StockRepository implements IStockRepository {
   async update(id_stock: number, data: Partial<Stock>): Promise<Stock> {
     const updated = await prisma.stock.update({
       where: { id_stock },
-      data: data as any
+      data: {
+        quantidade_bolsas:{
+          increment: data.quantidade_bolsas || 0
+        },
+        }
+      });
+
+    return updated as unknown as Stock;
+  }
+
+  async decrementStock(id_stock: number, quantidade: number): Promise<Stock> {
+    const updated = await prisma.stock.update({
+      where: { id_stock },
+      data: {
+        quantidade_bolsas: {
+          decrement: quantidade
+        }
+      }
     });
     return updated as unknown as Stock;
   }

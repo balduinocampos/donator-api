@@ -7,7 +7,7 @@ import {
 } from '../schemas/auditoriaSchema';
 
 import { auditoriaFactory } from '../factories/auditoriaFactory';
-import z, { uuid, ZodError } from 'zod';
+import {  ZodError } from 'zod';
 import { AppError } from '@/shared/error';
 
 export class AuditoriaController {

@@ -5,8 +5,6 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const routes = Router();
 const controller = new PedidoController();
 
-routes.use(authMiddleware);
-
 // ======================================================
 // 📌 PEDIDOS URGENTES (HOSPITAL -> SISTEMA)
 // ======================================================
@@ -23,7 +21,7 @@ routes.delete('/:id', controller.deletePedido);
 // 📌 PEDIDOS DE DOAÇÃO (HOSPITAL -> DOADOR)
 // ======================================================
 
-routes.post('/doacao', controller.requestDoacao);
+routes.post('/doacao',  controller.requestDoacao);
 routes.get('/doacao', controller.getAllDoacoes);
 routes.get('/doacao/:id_doador', controller.getDoacoesByDoador);
 routes.get('/doacao/hospital/:id_hospital', controller.getDoacoesByHospital);
@@ -35,7 +33,7 @@ routes.delete('/doacao/:id', controller.deletePedidoDoacao);
 // 📌 PEDIDOS ENTRE HOSPITAIS
 // ======================================================
 
-routes.post('/hospitais', controller.requestBolsas);
+routes.post('/hospitais',  controller.requestBolsas);
 routes.get('/hospitais', controller.getAllEntreHospitais);
 routes.get('/hospitais/:id', controller.getPedidoEntreById);
 routes.get('/hospitais/solicitante/:id', controller.getBySolicitante);

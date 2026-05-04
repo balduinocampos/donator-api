@@ -85,6 +85,22 @@ export class StockController {
     }
   }
 
+  async updateStockRelative(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { quantidade_bolsas } = UpdateStockSchema.parse(req.body);
+      const service = stockFactory();
+
+      const updated = await service.updateStockRelative(Number(id), quantidade_bolsas);
+      return res.status(200).json(updated);
+
+    } catch (error) {
+      if (error instanceof ZodError) throw AppError.badRequest('Validation failed', error.issues);
+        if (error instanceof AppError) throw error;
+        throw AppError.internal('Erro ao atualizar stock', error);
+    }
+  }
+
   async deleteStock(req: Request, res: Response) {
     try {
       const { id } = req.params;

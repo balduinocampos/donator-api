@@ -43,6 +43,12 @@ export class StockService {
     return updated as StockResponseDTO;
   }
 
+  async updateStockRelative(id: number, quantidade_bolsas: number): Promise<StockResponseDTO> {
+    const updated = await this.stockRepository.decrementStock(id, quantidade_bolsas);
+    if (!updated) throw AppError.notFound('Stock record not found');
+    return updated as StockResponseDTO;
+  }
+
   async deleteStock(id: number): Promise<void> {
     const success = await this.stockRepository.delete(id);
     if (!success) throw AppError.notFound('Stock record not found');

@@ -14,7 +14,6 @@ routes.post('/login', controller.login);
 // ======================
 // PROTEGIDAS
 // ======================
-routes.use(authMiddleware);
 
 // CRUD
 routes.get('/', controller.getAllHospitais);       

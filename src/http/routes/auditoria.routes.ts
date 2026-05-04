@@ -5,18 +5,16 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const routes = Router();
 const controller = new AuditoriaController();
 
-routes.use(authMiddleware);
-
 // ======================
 // LOGS
 // ======================
-routes.post('/log', controller.registerLog.bind(controller));
-routes.get('/log', controller.getAllLogs.bind(controller));
-routes.get('/log/:id', controller.getLogById.bind(controller));
-routes.get('/log/hospital/:id_hospital', controller.getLogsByHospital.bind(controller));
-routes.get('/log/doador/:id_doador', controller.getLogsByDoador.bind(controller));
-routes.put('/log/:id', controller.updateLog.bind(controller));
-routes.delete('/log/:id', controller.deleteLog.bind(controller));
+routes.post('/log',  controller.registerLog.bind(controller));
+routes.get('/log',  controller.getAllLogs.bind(controller));
+routes.get('/log/:id',  controller.getLogById.bind(controller));
+routes.get('/log/hospital/:id_hospital',  controller.getLogsByHospital.bind(controller));
+routes.get('/log/doador/:id_doador',  controller.getLogsByDoador.bind(controller));
+routes.put('/log/:id',  controller.updateLog.bind(controller));
+routes.delete('/log/:id',  controller.deleteLog.bind(controller));
 
 // ======================
 // SESSÃO ADMIN

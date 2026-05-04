@@ -15,7 +15,6 @@ routes.post('/reset-password', controller.resetPassword.bind(controller));
 // ======================
 // ROTAS PROTEGIDAS
 // ======================
-routes.use(authMiddleware);
 
 // 🔎 BUSCAS (colocar antes de /:id pra evitar conflito)
 routes.get('/email', controller.getByEmail.bind(controller)); 
@@ -25,8 +24,8 @@ routes.get('/telefone', controller.getByTelefone.bind(controller));
 routes.get('/', controller.getAllDoadores.bind(controller));
 
 // 👤 PERFIL
-routes.get('/:id', controller.getProfile.bind(controller));
-routes.put('/:id', controller.updateInfo.bind(controller));
+routes.get('/:id',  controller.getProfile.bind(controller));
+routes.put('/:id',  controller.updateInfo.bind(controller));
 routes.delete('/:id', controller.deleteDoador.bind(controller));
 
 // 🔐 SEGURANÇA

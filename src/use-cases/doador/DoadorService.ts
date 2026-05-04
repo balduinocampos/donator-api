@@ -22,9 +22,17 @@ export class DoadorService {
     const senha_hash = data.senha ? await bcrypt.hash(data.senha, 10) : '';
 
     const doadorEntity = new Doador({
-      ...data,
+      nome_completo: data.nome_completo,
+      telefone: data.telefone,
+      email: data.email,
+      tipo_sanguineo: data.tipo_sanguineo,
+      id_municipio: data.id_municipio,
+      data_nascimento: data.data_nascimento,
+      consentimento_sms: data.consentimento_sms,
       senha_hash
     });
+
+    console.log('Criando doador com os seguintes dados:', doadorEntity);
 
     const created = await this.doadorRepository.create(doadorEntity);
     return this.toResponseDTO(created);

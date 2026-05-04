@@ -5,13 +5,11 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const routes = Router();
 const controller = new GamificacaoController();
 
-routes.use(authMiddleware);
-
 // ======================
 // ESTATÍSTICAS
 // ======================
-routes.get('/status/:id_doador', controller.getStatus.bind(controller));
-routes.get('/doador/:id_doador', controller.getEstatisticaDoador.bind(controller));
+routes.get('/status/:id_doador',  controller.getStatus.bind(controller));
+routes.get('/doador/:id_doador',  controller.getEstatisticaDoador.bind(controller));
 routes.get('/estatistica/:id', controller.getEstatisticaById.bind(controller));
 routes.get('/ranking/top', controller.getTopDoador.bind(controller));
 

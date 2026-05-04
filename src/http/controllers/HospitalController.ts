@@ -97,16 +97,10 @@ export class HospitalController {
 
       const result = await service.login(email, senha);
 
-      res.cookie('token', result.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000
-      });
-
       const auditoria = auditoriaFactory();
 
       await auditoria.registerAdminSession({
-        id_sessao: result.token,
+        id_sessao: result.user.email,
         id_usuario: result.user.id_hospital,
         ip_origem: req.ip || '0.0.0.0',
         user_agent: req.headers['user-agent'] || 'Desconhecido',

@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16
-    container_name: donator_postgres
+    container_name: donatordatabase
     restart: always
 
     environment:

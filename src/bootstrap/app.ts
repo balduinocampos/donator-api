@@ -5,15 +5,6 @@ import { errorHandler } from '@/http/middleware/errorHandler';
 
 export const appExpress = express();
 
-appExpress.use((req, res, next) => {
-  console.log("REQUEST CHEGOU:", req.url);
-  next();
-});
-
-appExpress.get("/test", (req, res) => {
-  res.json({ ok: true });
-});
-
 appExpress.use(RateLimitServices.apply());
 
 appExpress.use(express.json());

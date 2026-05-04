@@ -21,11 +21,12 @@ export class DoadorController {
     try {
       const data = CreateDoadorSchema.parse(req.body);
       const service = daodorFactory();
-
+      console.log('Dados recebidos para criação de doador:', data);
       const result = await service.createDoador(data);
       return res.status(201).json(result);
 
     } catch (error) {
+      console.error('Erro ao registrar doador:', error);
       if (error instanceof ZodError) {
         const formatted = error.issues.map(err => ({
           field: err.path[0],
@@ -123,16 +124,10 @@ export class DoadorController {
 
       const result = await service.login(email, senha);
 
-      res.cookie('token', result.token, {
-        httpOnly: true,
-        secure: env.ENVOIRONMENT === 'production',
-        maxAge: 24 * 60 * 60 * 1000
-      });
-
       const auditoria = auditoriaFactory();
 
       await auditoria.registerDoadorSession({
-        id_sessao: result.token,
+        id_sessao: result.user.id_doador.toString(),
         id_usuario: result.user.id_doador,
         ip_origem: req.ip || '0.0.0.0',
         user_agent: req.headers['user-agent'] || 'Desconhecido',
@@ -151,6 +146,7 @@ export class DoadorController {
         user: result.user,
         token: result.token
       });
+      
 
     } catch (error: any) {
       if (error instanceof ZodError) {

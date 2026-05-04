@@ -4,10 +4,6 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const routes = Router();
 const controller = new GeografiaController();
-
-// 🔐 Proteção global
-routes.use(authMiddleware);
-
 // ======================
 // PROVÍNCIAS
 // ======================

@@ -2,7 +2,6 @@ import { IPedidoEntreHospitaisRepository } from '@/domain/contracts/IPedidoEntre
 import { PedidoEntreHospitais } from '@/domain/entities/PedidoEntreHospitais';
 import { prisma } from '@/infra/db/connect';
 
-
 export class PedidoEntreHospitaisRepository implements IPedidoEntreHospitaisRepository {
   async create(data: PedidoEntreHospitais): Promise<PedidoEntreHospitais> {
     const created = await prisma.pedidoEntreHospitais.create({

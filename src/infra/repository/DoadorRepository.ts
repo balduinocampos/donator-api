@@ -5,17 +5,18 @@ import { prisma } from '@/infra/db/connect';
 
 export class DoadorRepository implements IDoadorRepository {
   async create(data: Doador): Promise<Doador> {
+    console.log('Criando doador no banco de dados com dados:', data);
     const created = await prisma.doador.create({
       data: {
         nome_completo: data.nome_completo,
         telefone: data.telefone,
         email: data.email,
         senha_hash: data.senha_hash,
-        tipo_sanguineo: data.tipo_sanguineo as any,
+        tipo_sanguineo: data.tipo_sanguineo,
         id_municipio: data.id_municipio,
         data_nascimento: data.data_nascimento,
         consentimento_sms: data.consentimento_sms,
-        status: data.status as any
+        status: data.status
       }
     });
     return created as unknown as Doador;

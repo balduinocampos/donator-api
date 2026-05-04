@@ -5,8 +5,6 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const routes = Router();
 const controller = new ComunicacaoController();
 
-routes.use(authMiddleware);
-
 // ======================
 // MENSAGENS
 // ======================
