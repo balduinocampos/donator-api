@@ -65,9 +65,9 @@ export class PedidoService {
     return pedido as PedidoDoacaoResponseDTO | null;
   }
 
-  async answerPedidoDoacao(id: number, data: UpdatePedidoDoacaoDTO): Promise<PedidoDoacaoResponseDTO> {
-    const updated = await this.pedidoDoacaoRepository.update(id, data);
-    return updated as PedidoDoacaoResponseDTO;
+  async answerPedidoDoacao(id: number, data: { status: 'aceite' | 'rejeitado'; data_resposta: Date }) {
+    const updated = await this.pedidoDoacaoRepository.answer(id, data);
+    return updated;
   }
   
   async getDoacoesByDoador(id_doador: number): Promise<PedidoDoacaoResponseDTO[]> {

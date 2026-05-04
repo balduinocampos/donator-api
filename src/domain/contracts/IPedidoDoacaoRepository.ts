@@ -7,5 +7,6 @@ export interface IPedidoDoacaoRepository {
   findAllByHospital(id_hospital: number): Promise<PedidoDoacao[]>;
   findAll(): Promise<PedidoDoacao[]>;
   update(id_pedido_doacao: number, data: Partial<PedidoDoacao>): Promise<PedidoDoacao>;
+  answer(id_pedido_doacao: number, data: { status: 'aceite' | 'rejeitado'; data_resposta: Date }): Promise<PedidoDoacao>;
   delete(id_pedido_doacao: number): Promise<boolean>;
 }

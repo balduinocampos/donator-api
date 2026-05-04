@@ -130,11 +130,11 @@ export class PedidoController {
   async answerDoacao(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = AnswerPedidoDoacaoSchema.parse(req.body);
+      const { status } = AnswerPedidoDoacaoSchema.parse(req.body);
 
       const service = pedidoFactory();
       const updated = await service.answerPedidoDoacao(Number(id), {
-        ...data,
+        status,
         data_resposta: new Date()
       });
 

@@ -15,7 +15,13 @@ export class PedidoDoacaoRepository implements IPedidoDoacaoRepository {
   }
 
   async findById(id_pedido_doacao: number): Promise<PedidoDoacao | null> {
-    const p = await prisma.pedidoDoacao.findUnique({ where: { id_pedido_doacao } });
+    const p = await prisma.pedidoDoacao.findUnique({
+       where: { id_pedido_doacao },
+       include:{
+          hospital: true,
+          doador: true
+       } 
+      });
     return p as unknown as PedidoDoacao | null;
   }
 
@@ -25,12 +31,25 @@ export class PedidoDoacaoRepository implements IPedidoDoacaoRepository {
   }
 
   async findAllByHospital(id_hospital: number): Promise<PedidoDoacao[]> {
-    const p = await prisma.pedidoDoacao.findMany({ where: { id_hospital } });
+    const p = await prisma.pedidoDoacao.findMany({
+      where: { id_hospital } ,
+      include:{
+          hospital: true,
+          doador: true
+       }
+      });
     return p as unknown as PedidoDoacao[];
   }
 
   async findAll(): Promise<PedidoDoacao[]> {
-    const p = await prisma.pedidoDoacao.findMany();
+    const p = await prisma.pedidoDoacao.findMany(
+      {
+        include:{
+          hospital: true,
+          doador: true
+       }
+      }
+    );
     return p as unknown as PedidoDoacao[];
   }
 
@@ -38,6 +57,17 @@ export class PedidoDoacaoRepository implements IPedidoDoacaoRepository {
     const updated = await prisma.pedidoDoacao.update({
       where: { id_pedido_doacao },
       data: data as any
+    });
+    return updated as unknown as PedidoDoacao;
+  }
+
+  async answer(id_pedido_doacao: number, data: { status: 'aceite' | 'rejeitado'; data_resposta: Date }): Promise<PedidoDoacao> {
+    const updated = await prisma.pedidoDoacao.update({
+      where: { id_pedido_doacao },
+      data: {
+        status: data.status,
+        data_resposta: data.data_resposta
+      } as any
     });
     return updated as unknown as PedidoDoacao;
   }
